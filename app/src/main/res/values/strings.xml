@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">PillReminder</string>
+    <string name="app_name">یادآور دارو</string>
+    <string name="medicine_reminder">یادآور دارو</string>
 </resources>
