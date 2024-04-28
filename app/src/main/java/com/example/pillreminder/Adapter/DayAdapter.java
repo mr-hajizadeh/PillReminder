@@ -22,7 +22,13 @@ import saman.zamani.persiandate.PersianDateFormat;
 public class DayAdapter extends RecyclerView.Adapter<DayAdapter.MonthHolder> {
 
     private List<Day> dayList;
+    private final OnDayItemListener onDayItemListener;
     private Context context;
+    private int selectedItem = -1;
+
+    public DayAdapter(OnDayItemListener onDayItemListener) {
+        this.onDayItemListener = onDayItemListener;
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     public void setDayList(List<Day> dayList) {
@@ -56,11 +62,26 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.MonthHolder> {
             holder.dateTxt.setTextColor(colorId);
             holder.titleTxt.setTextColor(colorId);
         } else {
-            holder.itemBg.setBackground(context.getDrawable(R.drawable.day_background));
-            int colorId = ContextCompat.getColor(context, android.R.color.secondary_text_light);
-            holder.dateTxt.setTextColor(colorId);
-            holder.titleTxt.setTextColor(colorId);
+            if (selectedItem > -1 && selectedItem == position) {
+                holder.itemBg.setBackground(context.getDrawable(R.drawable.item_selector));
+                @SuppressLint("PrivateResource")
+                int colorId = ContextCompat.getColor(context, com.google.android.material.R.color.m3_sys_color_dark_on_tertiary_container);
+                holder.dateTxt.setTextColor(colorId);
+                holder.titleTxt.setTextColor(colorId);
+            } else {
+                holder.itemBg.setBackground(context.getDrawable(R.drawable.day_background));
+                int colorId = ContextCompat.getColor(context, android.R.color.secondary_text_light);
+                holder.dateTxt.setTextColor(colorId);
+                holder.titleTxt.setTextColor(colorId);
+            }
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            notifyItemChanged(selectedItem);
+            selectedItem = position;
+            notifyItemChanged(selectedItem);
+            onDayItemListener.onChange(day);
+        });
 
     }
 

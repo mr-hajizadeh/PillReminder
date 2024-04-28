@@ -5,9 +5,6 @@
     android:layout_height="wrap_content"
     android:layout_marginEnd="8dp"
     android:background="@drawable/day_background"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackgroundBorderless"
     android:orientation="vertical">
 
     <TextView

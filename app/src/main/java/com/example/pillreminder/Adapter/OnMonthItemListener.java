@@ -6,4 +6,6 @@ public interface OnMonthItemListener {
 
     void onClick(Month month);
 
+    void onChange(Month month);
+
 }

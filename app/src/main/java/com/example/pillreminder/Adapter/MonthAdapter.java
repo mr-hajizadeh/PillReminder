@@ -24,6 +24,7 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MonthHolder>
     private final List<Month> monthList;
     private final OnMonthItemListener onMonthItemListener;
     private Context context;
+    private int selectedItem = -1;
 
     public MonthAdapter(List<Month> monthList, OnMonthItemListener onMonthItemListener) {
         this.monthList = monthList;
@@ -40,9 +41,9 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MonthHolder>
                 false));
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint({"UseCompatLoadingForDrawables", "PrivateResource"})
     @Override
-    public void onBindViewHolder(@NonNull MonthHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MonthHolder holder, @SuppressLint("RecyclerView") int position) {
 
         Month month = monthList.get(position);
         holder.titleTxt.setText(month.getTitle());
@@ -53,9 +54,23 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.MonthHolder>
         if (currentDate.after(month.getStartOfMonthDate()) && currentDate.before(month.getEndOfMonthDate())) {
             holder.itemBg.setBackground(context.getDrawable(R.drawable.active_month_background));
             holder.titleTxt.setTextColor(ContextCompat.getColor(context, com.google.android.material.R.color.design_default_color_primary));
+        } else {
+            if (selectedItem > -1 && selectedItem == position) {
+                holder.itemBg.setBackground(context.getDrawable(R.drawable.item_selector));
+                holder.titleTxt.setTextColor(ContextCompat.getColor(context, com.google.android.material.R.color.m3_sys_color_dark_on_tertiary_container));
+            } else {
+                holder.itemBg.setBackground(context.getDrawable(R.drawable.month_background));
+                holder.titleTxt.setTextColor(ContextCompat.getColor(context, android.R.color.secondary_text_light));
+            }
         }
 
-        holder.itemView.setOnClickListener(v -> onMonthItemListener.onClick(month));
+        holder.itemView.setOnClickListener(v -> {
+            onMonthItemListener.onClick(month);
+            notifyItemChanged(selectedItem);
+            selectedItem = position;
+            notifyItemChanged(selectedItem);
+            onMonthItemListener.onChange(month);
+        });
 
     }
 
