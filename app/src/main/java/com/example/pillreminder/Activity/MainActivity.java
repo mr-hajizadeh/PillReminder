@@ -1,5 +1,6 @@
 package com.example.pillreminder.Activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
                     persianDate, "Y/m/d",
                     PersianDateFormat.PersianDateNumberCharacter.FARSI);
 
-            Toast.makeText(this, date, Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, AddActivity.class));
         });
 
     }

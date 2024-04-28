@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">یادآور دارو</string>
     <string name="medicine_reminder">یادآور دارو</string>
+    <string name="add_reminder">افزودن یادآور</string>
+    <string name="notification">اعلان</string>
+    <string name="start_hour">ساعت شروع</string>
+    <string name="alarm">زنگ هشدار</string>
+    <string name="default_text">پیشفرض</string>
+    <string name="timing">زمانبدی</string>
+    <string name="repeat_hour">هر چند ساعت</string>
+    <string name="reminder_time">زمان یادآوری</string>
+    <string name="description">توضیحات</string>
+    <string name="medicine_name">نام دارو</string>
+    <string name="medicine">دارو</string>
 </resources>
