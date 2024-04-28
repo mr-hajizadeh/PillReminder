@@ -2,8 +2,6 @@ package com.example.pillreminder.Adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -17,8 +15,6 @@ import com.example.pillreminder.Model.Day;
 import com.example.pillreminder.R;
 import com.example.pillreminder.databinding.DayItemBinding;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import saman.zamani.persiandate.PersianDateFormat;
@@ -87,14 +83,6 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.MonthHolder> {
             itemBg = binding.itemBg;
 
         }
-    }
-
-    public int activeDayPosition() {
-        for (int i = 0; i < dayList.size(); i++) {
-            if (dayList.get(i).isActive())
-                return i;
-        }
-        return 0;
     }
 
 }

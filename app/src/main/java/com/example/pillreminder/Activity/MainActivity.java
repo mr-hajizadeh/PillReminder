@@ -1,7 +1,6 @@
 package com.example.pillreminder.Activity;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,15 +38,17 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
 
     private void initViews() {
 
+        PersianDate persianDate = new PersianDate();
+
         RecyclerView monthView = binding.monthView;
         monthView.setAdapter(new MonthAdapter(generateMonthNames(), this));
+        monthView.scrollToPosition(persianDate.getShMonth() - 1);
 
-        PersianDate persianDate = new PersianDate();
         RecyclerView dayView = binding.dayView;
         dayAdapter = new DayAdapter();
         dayAdapter.setDayList(generateDay(persianDate));
         dayView.setAdapter(dayAdapter);
-        dayView.scrollToPosition(dayAdapter.activeDayPosition());
+        dayView.scrollToPosition(persianDate.getShDay() - 1);
 
     }
 
