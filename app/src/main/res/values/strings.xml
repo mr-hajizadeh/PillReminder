@@ -12,4 +12,12 @@
     <string name="description">توضیحات</string>
     <string name="medicine_name">نام دارو</string>
     <string name="medicine">دارو</string>
+    <string name="start_date">تاریخ شروع</string>
+    <string name="accept">تایید</string>
+    <string name="cancel">انصراف</string>
+    <string name="day">روز</string>
+    <string name="time_picker_title">زمان هشدار را انتخاب کنید</string>
+    <string name="slide_to_cancel">برای لغو کردن، نوار را بکشید</string>
+    <string name="day_count">تعداد روز</string>
+    <string name="set_reminder">تنظیم هشدار</string>
 </resources>

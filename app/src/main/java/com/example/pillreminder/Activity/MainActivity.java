@@ -77,7 +77,9 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
                     persianDate, "Y/m/d",
                     PersianDateFormat.PersianDateNumberCharacter.FARSI);
 
-            startActivity(new Intent(this, AddActivity.class));
+            Intent intent = new Intent(this, AddActivity.class);
+            intent.putExtra("date", date);
+            startActivity(intent);
         });
 
     }
