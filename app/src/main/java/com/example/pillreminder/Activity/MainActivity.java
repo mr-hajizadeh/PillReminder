@@ -1,9 +1,19 @@
 package com.example.pillreminder.Activity;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
     private HashMap<Integer, List<Day>> monthWithDay;
     private PersianDate persianDate;
 
+    @SuppressLint("InlinedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +53,12 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
         setContentView(binding.getRoot());
 
         initViews();
+
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+        } else {
+            createNotificationChannel();
+        }
 
     }
 
@@ -73,12 +90,10 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
 
         FloatingActionButton fab = binding.fab;
         fab.setOnClickListener(v -> {
-            String date = PersianDateFormat.format(
-                    persianDate, "Y/m/d",
-                    PersianDateFormat.PersianDateNumberCharacter.FARSI);
-
             Intent intent = new Intent(this, AddActivity.class);
-            intent.putExtra("date", date);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(persianDate.getTime());
+            intent.putExtra("date", persianDate.getTime());
             startActivity(intent);
         });
 
@@ -142,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
         return new Date(endDate.getTime());
     }
 
-
     private List<Day> generateDay(PersianDate persianDate) {
 
         if (monthWithDay == null || monthWithDay.get(persianDate.getShMonth()) == null) {
@@ -179,6 +193,28 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
         return monthWithDay.get(persianDate.getShMonth());
 
     }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "reminder";
+            String description = "reminderDescription";
+            int importance = NotificationManager.IMPORTANCE_HIGH; // تنظیم اهمیت به HIGH
+            NotificationChannel channel = new NotificationChannel("channel_id", name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    ActivityResultLauncher<String> permissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                if (isGranted)
+                    createNotificationChannel();
+                else
+                    Toast.makeText(this, "Not Granted", Toast.LENGTH_SHORT).show();
+            }
+    );
 
     @Override
     public void onClick(Month month) {

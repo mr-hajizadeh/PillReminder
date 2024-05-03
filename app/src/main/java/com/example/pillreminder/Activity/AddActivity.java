@@ -10,24 +10,20 @@ import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.pillreminder.Model.Reminder;
 import com.example.pillreminder.R;
 import com.example.pillreminder.databinding.ActivityAddBinding;
 import com.google.android.material.button.MaterialButton;
@@ -37,32 +33,36 @@ import com.google.android.material.timepicker.TimeFormat;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import saman.zamani.persiandate.PersianDate;
+import saman.zamani.persiandate.PersianDateFormat;
+
 public class AddActivity extends AppCompatActivity {
 
-    private final String[] permissions = {Manifest.permission.RECORD_AUDIO};
     private final String[] audioTypes = {
             "پیشفرض",
             "آهنگ",
             "ضبط صدا"
     };
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static String fileName = null;
     private ActivityAddBinding binding;
     private MediaRecorder recorder = null;
     private MediaPlayer player = null;
     private boolean startRecording = true;
     private boolean limitedDay = false;
-    private int days = 1;
+    private int days = 90;
+    private int audioTypeSelected = 0;
     private SeekBar seekBar;
     private ImageView playBtn;
     private TextView limitDayCounterTxt;
     private AutoCompleteTextView audioTypeCtv;
     private Timer timer;
+    private PersianDate startDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +79,7 @@ public class AddActivity extends AppCompatActivity {
         binding.backBtn.setOnClickListener(v -> finish());
 
         TextView startTimeTxt, startDateTxt, reminderTimeTxt;
-        TextInputEditText medicineNameEdt, descriptionEdt, dayCountEdt;
+        TextInputEditText medicineNameEdt, descriptionEdt;
         MaterialButton recorderBtn;
         LinearLayout playerView, recorderView, limitView;
         RadioButton continuousRd, limitedRd;
@@ -88,6 +88,8 @@ public class AddActivity extends AppCompatActivity {
         startTimeTxt = binding.startTimeReminderTxt;
         startDateTxt = binding.startDateReminderTxt;
         reminderTimeTxt = binding.reminderTimeTxt;
+        medicineNameEdt = binding.medicineNameEdt;
+        descriptionEdt = binding.descriptionEdt;
         recorderBtn = binding.recorderBtn;
         playBtn = binding.playPauseBtn;
         playerView = binding.playerView;
@@ -100,24 +102,29 @@ public class AddActivity extends AppCompatActivity {
         limitedDaySk = binding.limitDaySk;
         limitView = binding.limitView;
 
-        startDateTxt.setText(Objects.requireNonNull(getIntent().getExtras()).getString("date"));
+        Date date = new Date(Objects.requireNonNull(getIntent().getExtras()).getLong("date"));
+        startDate = new PersianDate(date);
+        startDateTxt.setText(PersianDateFormat.format(startDate, "Y/m/d"));
 
         Calendar calendar = Calendar.getInstance();
-
         reminderTimeTxt.setText(clockFormat(
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE)
         ));
         reminderTimeTxt.setOnClickListener(v -> timePicker(reminderTimeTxt));
 
+        reminderTimeTxt.setText(clockFormat(
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE)
+        ));
         startTimeTxt.setOnClickListener(v -> timePicker(startTimeTxt));
 
         fileName = Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath();
         fileName += "/audiorecordtest.3gp";
 
         recorderBtn.setOnClickListener(v -> {
-            if (checkSelfPermission(permissions[0]) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(AddActivity.this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+            if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                audioPermission.launch(Manifest.permission.RECORD_AUDIO);
             } else {
                 onRecord(startRecording);
                 if (startRecording) {
@@ -165,8 +172,9 @@ public class AddActivity extends AppCompatActivity {
                 audioTypes
         );
         audioTypeCtv.setAdapter(arrayAdapter);
-        audioTypeCtv.setText(audioTypes[0], false);
+        audioTypeCtv.setText(audioTypes[audioTypeSelected], false);
         audioTypeCtv.setOnItemClickListener((parent, view, position, id) -> {
+            audioTypeSelected = position;
             switch (position) {
                 case 0:
                     recorderView.setVisibility(View.GONE);
@@ -185,6 +193,7 @@ public class AddActivity extends AppCompatActivity {
             }
         });
 
+        limitedDaySk.setProgress(days);
         limitedDaySk.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @SuppressLint("SetTextI18n")
             @Override
@@ -210,6 +219,7 @@ public class AddActivity extends AppCompatActivity {
         continuousRd.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (limitedDay) {
                 limitedDay = false;
+                days = 1;
                 limitView.setVisibility(View.VISIBLE);
             }
         });
@@ -217,8 +227,44 @@ public class AddActivity extends AppCompatActivity {
         limitedRd.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (!limitedDay) {
                 limitedDay = true;
-                limitView.setVisibility(View.GONE);
+                days = 90;
+                limitView.setVisibility(View.VISIBLE);
             }
+        });
+
+        binding.submitBtn.setOnClickListener(v -> {
+
+            String title = Objects.requireNonNull(medicineNameEdt.getText()).toString();
+            String description = Objects.requireNonNull(descriptionEdt.getText()).toString();
+
+            Reminder reminder = new Reminder();
+            reminder.setTitle(title);
+            reminder.setDescription(description);
+            reminder.setReminderHour(reminderTimeTxt.getText().toString());
+            reminder.setStartDate(startDate);
+            reminder.setStartReminderHour(startTimeTxt.getText().toString());
+            reminder.setAudioType(audioTypeSelected);
+            reminder.setLimitedDay(limitedDay);
+
+            String[] time = reminder.getStartReminderHour().split(":");
+
+            Calendar startTimeCalendar = Calendar.getInstance();
+            startTimeCalendar.set(Calendar.YEAR, startDate.getGrgYear());
+            startTimeCalendar.set(Calendar.MONTH, startDate.getGrgMonth() - 1);
+            startTimeCalendar.set(Calendar.DAY_OF_MONTH, startDate.getGrgDay());
+            startTimeCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(time[0]));
+            startTimeCalendar.set(Calendar.MINUTE, Integer.parseInt(time[1]));
+            startTimeCalendar.set(Calendar.SECOND, 0);
+
+            Calendar endTimeCalendar = Calendar.getInstance();
+            endTimeCalendar.setTimeInMillis(startTimeCalendar.getTimeInMillis() + (days * 86400L) * 1000);
+
+            reminder.setStartMilliSecond(startTimeCalendar.getTimeInMillis());
+            reminder.setEndMilliSecond(endTimeCalendar.getTimeInMillis());
+
+//            AlarmHelper alarmHelper = new AlarmHelper(this);
+//            alarmHelper.setRepeatingAlarm(reminder);
+
         });
 
     }
@@ -276,15 +322,6 @@ public class AddActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
-            onRecord(true);
-        }
-
-    }
-
     private void onRecord(boolean start) {
         if (start) {
             startRecording();
@@ -314,6 +351,13 @@ public class AddActivity extends AppCompatActivity {
         recorder.release();
         recorder = null;
     }
+
+    ActivityResultLauncher<String> audioPermission = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                onRecord(true);
+            }
+    );
 
     ActivityResultLauncher<String> audioLauncher = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
