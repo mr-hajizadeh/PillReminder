@@ -64,7 +64,13 @@
                 android:id="@+id/reminderView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/reminder_item" />
 
         </LinearLayout>
     </ScrollView>
