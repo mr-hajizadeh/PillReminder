@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -95,6 +96,7 @@ public class AddActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("SetTextI18n")
     private void initViews() {
 
         binding.backBtn.setOnClickListener(v -> finish());
@@ -167,6 +169,7 @@ public class AddActivity extends AppCompatActivity {
         startDateTxt.setText(PersianDateFormat.format(startDate, "Y/m/d"));
 
         startTimeTxt.setText(clockFormat(reminder.getStartReminderHour()));
+        reminder.setStartReminderHour(clockFormat(reminder.getStartReminderHour()));
         startTimeTxt.setOnClickListener(v -> timePicker(startTimeTxt));
         startTimeTxt.addTextChangedListener(new TextWatcher() {
             @Override
@@ -186,6 +189,7 @@ public class AddActivity extends AppCompatActivity {
         });
 
         reminderTimeTxt.setText(clockFormat(reminder.getReminderHour()));
+        reminder.setReminderHour(clockFormat(reminder.getReminderHour()));
         reminderTimeTxt.setOnClickListener(v -> timePicker(reminderTimeTxt));
         reminderTimeTxt.addTextChangedListener(new TextWatcher() {
             @Override
@@ -255,6 +259,7 @@ public class AddActivity extends AppCompatActivity {
         );
         audioTypeCtv.setAdapter(arrayAdapter);
         audioTypeCtv.setText(audioTypes[(reminder.getAudioType() != 0 ? reminder.getAudioType() : 0)], false);
+        recorderView.setVisibility(reminder.getAudioType() == 2 ? View.VISIBLE : View.GONE);
         audioTypeCtv.setOnItemClickListener((parent, view, position, id) -> {
             reminder.setAudioType(position);
             switch (position) {
@@ -275,9 +280,13 @@ public class AddActivity extends AppCompatActivity {
         });
 
         reminder.setDays(reminder.getDays() != 0 ? reminder.getDays() : 90);
-        limitedDaySk.setProgress(reminder.getDays());
+        if (reminder.isLimitedDay()) {
+            limitedRd.setChecked(true);
+            limitedDaySk.setProgress(reminder.getDays());
+            limitDayCounterTxt.setText(reminder.getDays() + " " + getString(R.string.day));
+            limitView.setVisibility(View.VISIBLE);
+        }
         limitedDaySk.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @SuppressLint("SetTextI18n")
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
@@ -298,7 +307,7 @@ public class AddActivity extends AppCompatActivity {
             }
         });
 
-        continuousRd.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        continuousRd.setOnClickListener(v -> {
             if (reminder.isLimitedDay()) {
                 reminder.setLimitedDay(false);
                 reminder.setDays(reminder.getDays() < 0 ? 1 : reminder.getDays());
@@ -306,7 +315,7 @@ public class AddActivity extends AppCompatActivity {
             }
         });
 
-        limitedRd.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        limitedRd.setOnClickListener(v -> {
             if (!reminder.isLimitedDay()) {
                 reminder.setLimitedDay(true);
                 reminder.setDays(reminder.getDays() < 0 ? 90 : reminder.getDays());
@@ -316,48 +325,52 @@ public class AddActivity extends AppCompatActivity {
 
         binding.submitBtn.setOnClickListener(v -> {
 
+            String[] splitRepeatTime = reminder.getReminderHour().split(":");
+            int repeatHour = Integer.parseInt(splitRepeatTime[0]);
+            int repeatMinute = Integer.parseInt(splitRepeatTime[1]);
+
+            String[] startTime = reminder.getStartReminderHour().split(":");
+            int startHour = Integer.parseInt(startTime[0]);
+            int startMinute = Integer.parseInt(startTime[1]);
+
             if (reminder.getTitle() != null && !reminder.getTitle().isEmpty()) {
                 if (reminder.getDescription() != null && !reminder.getDescription().isEmpty()) {
+                    if (repeatHour >= 1) {
 
-                    String[] startTime = reminder.getStartReminderHour().split(":");
+                        Calendar startTimeCalendar = Calendar.getInstance();
+                        startTimeCalendar.set(Calendar.YEAR, startDate.getGrgYear());
+                        startTimeCalendar.set(Calendar.MONTH, startDate.getGrgMonth() - 1);
+                        startTimeCalendar.set(Calendar.DAY_OF_MONTH, startDate.getGrgDay());
+                        startTimeCalendar.set(Calendar.HOUR_OF_DAY, startHour);
+                        startTimeCalendar.set(Calendar.MINUTE, startMinute);
+                        startTimeCalendar.set(Calendar.SECOND, 0);
 
-                    Calendar startTimeCalendar = Calendar.getInstance();
-                    startTimeCalendar.set(Calendar.YEAR, startDate.getGrgYear());
-                    startTimeCalendar.set(Calendar.MONTH, startDate.getGrgMonth() - 1);
-                    startTimeCalendar.set(Calendar.DAY_OF_MONTH, startDate.getGrgDay());
-                    startTimeCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(startTime[0]));
-                    startTimeCalendar.set(Calendar.MINUTE, Integer.parseInt(startTime[1]));
-                    startTimeCalendar.set(Calendar.SECOND, 0);
+                        Calendar endTimeCalendar = Calendar.getInstance();
+                        endTimeCalendar.setTimeInMillis(
+                                startTimeCalendar.getTimeInMillis() + (reminder.getDays() * 86400L) * 1000);
 
-                    Calendar endTimeCalendar = Calendar.getInstance();
-                    endTimeCalendar.setTimeInMillis(
-                            startTimeCalendar.getTimeInMillis() + (reminder.getDays() * 86400L) * 1000);
+                        reminder.setStartMilliSecond(startTimeCalendar.getTimeInMillis());
+                        reminder.setEndMilliSecond(endTimeCalendar.getTimeInMillis());
 
-                    reminder.setStartMilliSecond(startTimeCalendar.getTimeInMillis());
-                    reminder.setEndMilliSecond(endTimeCalendar.getTimeInMillis());
+                        long repeatMillis = repeatHour * 60 * 60 * 1000L + repeatMinute * 60 * 1000L;
 
-                    String[] splitRepeatTime = reminder.getReminderHour().split(":");
-                    long hour = (Integer.parseInt(splitRepeatTime[0]) * 60 * 60 * 1000L);
-                    long minute = (Integer.parseInt(splitRepeatTime[1]) * 60 * 1000L);
+                        List<Long> hours = new ArrayList<>();
+                        for (long currentMillis = startTimeCalendar.getTimeInMillis();
+                             currentMillis < endTimeCalendar.getTimeInMillis(); currentMillis += repeatMillis) {
+                            hours.add(currentMillis);
+                        }
+                        reminder.setHours(hours);
 
-                    int hourCount = (24 * reminder.getDays()) / Integer.parseInt(splitRepeatTime[0]);
-                    List<Long> hours = new ArrayList<>();
-                    for (int i = 0; i <= hourCount; i++) {
-                        long eachTimeMillis = startTimeCalendar.getTimeInMillis() + ((i * (hour + minute)));
-                        if (eachTimeMillis <= reminder.getEndMilliSecond())
-                            hours.add(eachTimeMillis);
-                    }
-                    reminder.setHours(hours);
+                        if (isEdit)
+                            reminderViewModel.updateReminder(reminder);
+                        else
+                            reminderViewModel.insertReminder(reminder);
 
-                    if (isEdit)
-                        reminderViewModel.updateReminder(reminder);
-                    else
-                        reminderViewModel.insertReminder(reminder);
-
-                    finish();
+                        finish();
 //            AlarmHelper alarmHelper = new AlarmHelper(this);
 //            alarmHelper.setRepeatingAlarm(reminder);
-
+                    } else
+                        Toast.makeText(this, "زمان تکرار را نمی تواند کمتر از 1 ساعت باشد!", Toast.LENGTH_SHORT).show();
                 } else
                     Toast.makeText(this, "empty description", Toast.LENGTH_SHORT).show();
             } else

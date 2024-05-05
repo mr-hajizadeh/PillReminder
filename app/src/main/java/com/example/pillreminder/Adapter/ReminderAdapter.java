@@ -88,6 +88,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
     private List<Long> calculateHours(List<Long> hourList) {
         List<Long> hours = new ArrayList<>();
 
+        // تعیین ابتدا و انتهای روز جاری
         Calendar startCurrentDay = Calendar.getInstance();
         startCurrentDay.setTimeInMillis(currentDate.getTime());
         startCurrentDay.set(Calendar.HOUR_OF_DAY, 0);
@@ -100,12 +101,15 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         endCurrentDay.set(Calendar.MINUTE, 59);
         endCurrentDay.set(Calendar.SECOND, 59);
 
+        // تحقق شرط و اضافه کردن به لیست
         for (long eachMilliSecond : hourList) {
-            if (startCurrentDay.getTimeInMillis() <= eachMilliSecond && endCurrentDay.getTimeInMillis() >= eachMilliSecond) {
+            if (startCurrentDay.getTimeInMillis() <= eachMilliSecond
+                    && eachMilliSecond <= endCurrentDay.getTimeInMillis()) {
                 hours.add(eachMilliSecond);
             }
         }
         return hours;
     }
+
 
 }
