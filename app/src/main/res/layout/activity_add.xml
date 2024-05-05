@@ -171,7 +171,7 @@
                     android:focusable="true"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:padding="16dp"
-                    android:text="8:00"
+                    tools:text="8:00"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView21" />
@@ -238,7 +238,7 @@
                     android:focusable="true"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:padding="16dp"
-                    android:text="08:00"
+                    tools:text="08:00"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView6" />
@@ -282,7 +282,7 @@
                         android:id="@+id/recorderBtn"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="ضبط صدا" />
+                        android:text="@string/record_voice" />
 
                     <LinearLayout
                         android:id="@+id/playerView"
@@ -300,7 +300,8 @@
                             android:background="@drawable/play_pause_background"
                             android:padding="12dp"
                             app:srcCompat="@drawable/ic_play"
-                            app:tint="@color/white" />
+                            app:tint="@color/white"
+                            android:contentDescription="@string/app_name" />
 
                         <SeekBar
                             android:id="@+id/seekBar"
@@ -344,14 +345,14 @@
                         android:layout_height="wrap_content"
                         android:checked="true"
                         android:layoutDirection="rtl"
-                        android:text="ادامه دار" />
+                        android:text="@string/continuous" />
 
                     <RadioButton
                         android:id="@+id/limitedRd"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layoutDirection="rtl"
-                        android:text="مدت محدود" />
+                        android:text="@string/limited" />
                 </RadioGroup>
 
                 <LinearLayout
@@ -368,12 +369,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:text="1 روز" />
+                        android:text="@string/_1_day" />
 
                     <SeekBar
                         android:id="@+id/limitDaySk"
                         style="@style/Widget.AppCompat.SeekBar.Discrete"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:max="15"

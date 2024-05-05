@@ -8,22 +8,25 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pillreminder.Adapter.DayAdapter;
 import com.example.pillreminder.Adapter.MonthAdapter;
 import com.example.pillreminder.Adapter.OnDayItemListener;
 import com.example.pillreminder.Adapter.OnMonthItemListener;
+import com.example.pillreminder.Adapter.OnReminderItemClick;
+import com.example.pillreminder.Adapter.ReminderAdapter;
+import com.example.pillreminder.Database.ReminderViewModel;
 import com.example.pillreminder.Model.Day;
 import com.example.pillreminder.Model.Month;
+import com.example.pillreminder.Model.Reminder;
 import com.example.pillreminder.databinding.ActivityMainBinding;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -35,15 +38,15 @@ import java.util.HashMap;
 import java.util.List;
 
 import saman.zamani.persiandate.PersianDate;
-import saman.zamani.persiandate.PersianDateFormat;
 
-public class MainActivity extends AppCompatActivity implements OnMonthItemListener, OnDayItemListener {
+public class MainActivity extends AppCompatActivity implements OnMonthItemListener, OnDayItemListener, OnReminderItemClick {
 
     private final int[] jalaliDayInMonth = {31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29};
     private ActivityMainBinding binding;
     private DayAdapter dayAdapter;
     private HashMap<Integer, List<Day>> monthWithDay;
     private PersianDate persianDate;
+    private ReminderViewModel reminderViewModel;
 
     @SuppressLint("InlinedApi")
     @Override
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        reminderViewModel = new ViewModelProvider(this).get(ReminderViewModel.class);
         initViews();
 
         if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -78,15 +82,26 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
         dayView.scrollToPosition(persianDate.getShDay() - 1);
 
         initBottomAppBar();
+        initReminderView();
+
+    }
+
+    private void initReminderView() {
+
+        RecyclerView reminderView = binding.reminderView;
+        reminderViewModel.getReminders(persianDate.getTime()).observe(this, reminders -> {
+            if (reminders != null) {
+                ReminderAdapter reminderAdapter = new ReminderAdapter(reminders, persianDate, this);
+                reminderView.setAdapter(reminderAdapter);
+            }
+        });
 
     }
 
     private void initBottomAppBar() {
 
         BottomAppBar bottomAppBar = binding.bottomAppBar;
-        bottomAppBar.setNavigationOnClickListener(v -> {
-            Toast.makeText(this, "Setting", Toast.LENGTH_SHORT).show();
-        });
+        bottomAppBar.setNavigationOnClickListener(v -> Toast.makeText(this, "Setting", Toast.LENGTH_SHORT).show());
 
         FloatingActionButton fab = binding.fab;
         fab.setOnClickListener(v -> {
@@ -211,8 +226,6 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
             isGranted -> {
                 if (isGranted)
                     createNotificationChannel();
-                else
-                    Toast.makeText(this, "Not Granted", Toast.LENGTH_SHORT).show();
             }
     );
 
@@ -224,10 +237,24 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
     @Override
     public void onChange(Month month) {
         persianDate.setShMonth(month.getPersianDate().getShMonth());
+        initReminderView();
     }
 
     @Override
     public void onChange(Day day) {
         persianDate.setShDay(day.getPersianDate().getShDay());
+        initReminderView();
+    }
+
+    @Override
+    public void onItemClick(Reminder reminder) {
+        Intent editIntent = new Intent(this, AddActivity.class);
+        editIntent.putExtra("id", reminder.getId());
+        startActivity(editIntent);
+    }
+
+    @Override
+    public void onItemDelete(Reminder reminder) {
+        reminderViewModel.deleteReminder(reminder);
     }
 }

@@ -20,4 +20,12 @@
     <string name="slide_to_cancel">برای لغو کردن، نوار را بکشید</string>
     <string name="day_count">تعداد روز</string>
     <string name="set_reminder">تنظیم هشدار</string>
+    <string name="hour">ساعت</string>
+    <string name="record_voice">ضبط صدا</string>
+    <string name="continuous">ادامه دار</string>
+    <string name="limited">مدت محدود</string>
+    <string name="_1_day">1 روز</string>
+    <string name="stop_recording">توقف ضبط</string>
+    <string name="default_audio">پیشفرض</string>
+    <string name="sound_audio">آهنگ</string>
 </resources>

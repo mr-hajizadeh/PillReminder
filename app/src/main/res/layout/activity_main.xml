@@ -45,7 +45,8 @@
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/month_item" />
+                tools:listitem="@layout/month_item"
+                tools:ignore="RtlSymmetry" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/dayView"
@@ -58,7 +59,8 @@
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/day_item" />
+                tools:listitem="@layout/day_item"
+                tools:ignore="RtlSymmetry" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/reminderView"
