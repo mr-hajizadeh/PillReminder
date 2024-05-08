@@ -19,8 +19,8 @@ public class ReminderViewModel extends AndroidViewModel {
         repository = new ReminderRepository(application);
     }
 
-    public void insertReminder(Reminder reminder) {
-        repository.insertReminder(reminder);
+    public void insertReminder(Reminder reminder, DatabaseListener databaseListener) {
+        repository.insertReminder(reminder, databaseListener);
     }
 
     public void updateReminder(Reminder reminder) {

@@ -6,13 +6,13 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -28,16 +28,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.pillreminder.Database.DatabaseListener;
 import com.example.pillreminder.Database.ReminderViewModel;
 import com.example.pillreminder.Model.Reminder;
 import com.example.pillreminder.R;
+import com.example.pillreminder.Utils.AlarmHelper;
 import com.example.pillreminder.databinding.ActivityAddBinding;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -85,14 +91,16 @@ public class AddActivity extends AppCompatActivity {
                 .observe(this, reminder -> {
                     if (reminder != null) {
                         this.reminder = reminder;
+                        fileName = reminder.getAudioPath();
                         isEdit = true;
-                    } else
+                    } else {
                         this.reminder = new Reminder();
+                        File fileDirectory = getFilesDir();
+                        fileName = fileDirectory.getAbsolutePath() + "/" + System.currentTimeMillis() + "_audio.3gp";
+                    }
 
                     initViews();
                 });
-        fileName = Objects.requireNonNull(getExternalCacheDir()).getAbsolutePath();
-        fileName += "/audioRecord.3gp";
 
     }
 
@@ -208,6 +216,7 @@ public class AddActivity extends AppCompatActivity {
             }
         });
 
+        playerView.setVisibility(reminder.getAudioType() == 2 ? View.VISIBLE : View.GONE);
         recorderBtn.setOnClickListener(v -> {
             if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 audioPermission.launch(Manifest.permission.RECORD_AUDIO);
@@ -218,6 +227,8 @@ public class AddActivity extends AppCompatActivity {
                 } else {
                     recorderBtn.setText(getString(R.string.record_voice));
                     playerView.setVisibility(View.VISIBLE);
+                    Log.i("TAG", "initViews: " + fileName);
+                    reminder.setAudioPath(fileName);
                     setupMediaPlayer();
                 }
                 startRecording = !startRecording;
@@ -225,12 +236,16 @@ public class AddActivity extends AppCompatActivity {
         });
 
         playBtn.setOnClickListener(v -> {
-            if (player.isPlaying()) {
-                playBtn.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play));
-                player.pause();
-            } else {
-                playBtn.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_pause));
-                player.start();
+            if (player == null)
+                setupMediaPlayer();
+            else {
+                if (player.isPlaying()) {
+                    playBtn.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play));
+                    player.pause();
+                } else {
+                    playBtn.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_pause));
+                    player.start();
+                }
             }
         });
 
@@ -264,6 +279,7 @@ public class AddActivity extends AppCompatActivity {
             reminder.setAudioType(position);
             switch (position) {
                 case 0:
+                    reminder.setAudioPath(null);
                     recorderView.setVisibility(View.GONE);
                     if (player != null && player.isPlaying()) {
                         player.pause();
@@ -310,15 +326,15 @@ public class AddActivity extends AppCompatActivity {
         continuousRd.setOnClickListener(v -> {
             if (reminder.isLimitedDay()) {
                 reminder.setLimitedDay(false);
-                reminder.setDays(reminder.getDays() < 0 ? 1 : reminder.getDays());
-                limitView.setVisibility(View.VISIBLE);
+                reminder.setDays(90);
+                limitView.setVisibility(View.GONE);
             }
         });
 
         limitedRd.setOnClickListener(v -> {
             if (!reminder.isLimitedDay()) {
                 reminder.setLimitedDay(true);
-                reminder.setDays(reminder.getDays() < 0 ? 90 : reminder.getDays());
+                reminder.setDays(1);
                 limitView.setVisibility(View.VISIBLE);
             }
         });
@@ -361,14 +377,26 @@ public class AddActivity extends AppCompatActivity {
                         }
                         reminder.setHours(hours);
 
-                        if (isEdit)
-                            reminderViewModel.updateReminder(reminder);
-                        else
-                            reminderViewModel.insertReminder(reminder);
+                        AlarmHelper alarmHelper = new AlarmHelper(this);
 
-                        finish();
-//            AlarmHelper alarmHelper = new AlarmHelper(this);
-//            alarmHelper.setRepeatingAlarm(reminder);
+                        if (isEdit) {
+                            reminderViewModel.updateReminder(reminder);
+                        } else {
+                            reminderViewModel.insertReminder(reminder, id -> {
+                                long firstUpcomingTime = -1;
+                                for (long time : hours) {
+                                    if (time > System.currentTimeMillis()) {
+                                        firstUpcomingTime = time;
+                                        break;
+                                    }
+                                }
+                                reminder.setId((int) id);
+                                Log.i("TAG", "initViews: " + reminder.getId());
+                                alarmHelper.setAlarm(reminder, firstUpcomingTime);
+                                finish();
+                            });
+                        }
+
                     } else
                         Toast.makeText(this, "زمان تکرار را نمی تواند کمتر از 1 ساعت باشد!", Toast.LENGTH_SHORT).show();
                 } else
@@ -490,36 +518,54 @@ public class AddActivity extends AppCompatActivity {
                             String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                             audioTypeCtv.setText(displayName, false);
                             Log.i("TAG", "Audio file name: " + displayName);
-
-//                        MediaPlayer player = new MediaPlayer();
-//                        player.setAudioAttributes(new AudioAttributes.Builder()
-//                                .setUsage(AudioAttributes.USAGE_MEDIA)
-//                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-//                                .build());
-//
-//                        try {
-//                            player.setOnPreparedListener(mp -> {
-//                                Log.i("TAG", "Audio file name: " + displayName);
-//                                mp.start();
-//                            });
-//
-//                            player.setOnErrorListener((mp, what, extra) -> {
-//                                Log.e("TAG", "Error occurred while playing audio");
-//                                return false;
-//                            });
-//
-//                            player.setDataSource(getApplicationContext(), uri);
-//                            player.prepareAsync();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-
+                            Log.i("TAG", "Audio file path: " + getPathFromUri(uri));
+                            reminder.setAudioPath(getPathFromUri(uri));
                         }
                     }
-                } else
+                } else {
                     audioTypeCtv.setText(audioTypes[0], false);
+                }
             }
     );
+
+    private String getPathFromUri(Uri uri) {
+        String filePath = null;
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            if (inputStream != null) {
+                File tempFile = createTempFile();
+                if (tempFile != null) {
+                    copyInputStreamToFile(inputStream, tempFile);
+                    filePath = tempFile.getAbsolutePath();
+                }
+                inputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return filePath;
+    }
+
+    private File createTempFile() {
+        try {
+            return File.createTempFile("temp_audio", ".tmp", getCacheDir());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void copyInputStreamToFile(InputStream inputStream, File file) throws IOException {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            try (OutputStream outputStream = Files.newOutputStream(file.toPath())) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+        }
+    }
 
     @Override
     protected void onDestroy() {

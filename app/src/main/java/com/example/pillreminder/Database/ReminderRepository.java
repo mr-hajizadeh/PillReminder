@@ -18,8 +18,8 @@ public class ReminderRepository {
         reminderDao = reminderDatabase.reminderDao();
     }
 
-    public void insertReminder(Reminder reminder) {
-        new InsertAsyncTask(reminderDao).execute(reminder);
+    public void insertReminder(Reminder reminder, DatabaseListener databaseListener) {
+        new InsertAsyncTask(reminderDao, databaseListener).execute(reminder);
     }
 
     public void updateReminder(Reminder reminder) {
@@ -38,17 +38,19 @@ public class ReminderRepository {
         return reminderDao.getReminderById(id);
     }
 
-    private static class InsertAsyncTask extends AsyncTask<Reminder, Void, Void> {
+    private static class InsertAsyncTask extends AsyncTask<Reminder, Void, Long> {
 
         private final ReminderDao reminderDao;
+        private final DatabaseListener databaseListener;
 
-        public InsertAsyncTask(ReminderDao reminderDao) {
+        public InsertAsyncTask(ReminderDao reminderDao, DatabaseListener databaseListener) {
             this.reminderDao = reminderDao;
+            this.databaseListener = databaseListener;
         }
 
         @Override
-        protected Void doInBackground(Reminder... reminders) {
-            reminderDao.insertReminder(reminders[0]);
+        protected Long doInBackground(Reminder... reminders) {
+            databaseListener.onInsert(reminderDao.insertReminder(reminders[0]));
             return null;
         }
     }

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layoutDirection="rtl"
     tools:context=".Activity.AddActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -171,10 +172,10 @@
                     android:focusable="true"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:padding="16dp"
-                    tools:text="8:00"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView21" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView21"
+                    tools:text="8:00" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -238,10 +239,10 @@
                     android:focusable="true"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:padding="16dp"
-                    tools:text="08:00"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView6" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView6"
+                    tools:text="08:00" />
 
                 <TextView
                     android:id="@+id/textView2"
@@ -298,10 +299,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/play_pause_background"
+                            android:contentDescription="@string/app_name"
                             android:padding="12dp"
                             app:srcCompat="@drawable/ic_play"
-                            app:tint="@color/white"
-                            android:contentDescription="@string/app_name" />
+                            app:tint="@color/white" />
 
                         <SeekBar
                             android:id="@+id/seekBar"
@@ -381,6 +382,7 @@
                         android:min="1"
                         android:progress="1"
                         tools:ignore="UnusedAttribute" />
+
                 </LinearLayout>
 
             </LinearLayout>

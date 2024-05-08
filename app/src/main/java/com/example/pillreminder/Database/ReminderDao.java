@@ -15,7 +15,7 @@ import java.util.List;
 public interface ReminderDao {
 
     @Insert
-    void insertReminder(Reminder reminder);
+    long insertReminder(Reminder reminder);
 
     @Update
     void updateReminder(Reminder reminder);
@@ -29,6 +29,5 @@ public interface ReminderDao {
     @Query("SELECT * FROM Reminders " +
             "WHERE startMilliSecond < :currentMilliSecond AND endMilliSecond >= :currentMilliSecond")
     LiveData<List<Reminder>> getReminderByDate(Long currentMilliSecond);
-
 
 }

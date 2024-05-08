@@ -1,12 +1,16 @@
 package com.example.pillreminder.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import java.util.List;
 
 @Entity(tableName = "Reminders")
-public class Reminder {
+public class Reminder implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -22,6 +26,36 @@ public class Reminder {
     private List<Long> hours;
     private long startMilliSecond;
     private long endMilliSecond;
+
+    protected Reminder(Parcel in) {
+        id = in.readInt();
+        title = in.readString();
+        Description = in.readString();
+        reminderHour = in.readString();
+        startReminderHour = in.readString();
+        audioType = in.readInt();
+        audioPath = in.readString();
+        limitedDay = in.readByte() != 0;
+        alarmCounter = in.readInt();
+        days = in.readInt();
+        startMilliSecond = in.readLong();
+        endMilliSecond = in.readLong();
+    }
+
+    public Reminder() {
+    }
+
+    public static final Creator<Reminder> CREATOR = new Creator<Reminder>() {
+        @Override
+        public Reminder createFromParcel(Parcel in) {
+            return new Reminder(in);
+        }
+
+        @Override
+        public Reminder[] newArray(int size) {
+            return new Reminder[size];
+        }
+    };
 
     public int getId() {
         return id;
@@ -127,4 +161,24 @@ public class Reminder {
         this.endMilliSecond = endMilliSecond;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(title);
+        dest.writeString(Description);
+        dest.writeString(reminderHour);
+        dest.writeString(startReminderHour);
+        dest.writeInt(audioType);
+        dest.writeString(audioPath);
+        dest.writeByte((byte) (limitedDay ? 1 : 0));
+        dest.writeInt(alarmCounter);
+        dest.writeInt(days);
+        dest.writeLong(startMilliSecond);
+        dest.writeLong(endMilliSecond);
+    }
 }
