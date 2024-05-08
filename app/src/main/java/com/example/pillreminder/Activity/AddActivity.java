@@ -28,7 +28,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.pillreminder.Database.DatabaseListener;
 import com.example.pillreminder.Database.ReminderViewModel;
 import com.example.pillreminder.Model.Reminder;
 import com.example.pillreminder.R;
@@ -59,11 +58,10 @@ import saman.zamani.persiandate.PersianDateFormat;
 public class AddActivity extends AppCompatActivity {
 
     private String[] audioTypes;
-    private String fileName = null;
     private ActivityAddBinding binding;
     private MediaRecorder recorder = null;
     private MediaPlayer player = null;
-    private boolean startRecording = true;
+    private boolean startRecording = false;
     private boolean isEdit = false;
     private SeekBar seekBar;
     private ImageView playBtn;
@@ -89,14 +87,15 @@ public class AddActivity extends AppCompatActivity {
         reminderViewModel.getReminderById(
                         Objects.requireNonNull(getIntent().getExtras()).getInt("id"))
                 .observe(this, reminder -> {
+                    File fileDirectory = getFilesDir();
                     if (reminder != null) {
                         this.reminder = reminder;
-                        fileName = reminder.getAudioPath();
+                        if (this.reminder.getAudioPath() == null)
+                            this.reminder.setAudioPath(fileDirectory.getAbsolutePath() + "/" + System.currentTimeMillis() + "_audio.3gp");
                         isEdit = true;
                     } else {
                         this.reminder = new Reminder();
-                        File fileDirectory = getFilesDir();
-                        fileName = fileDirectory.getAbsolutePath() + "/" + System.currentTimeMillis() + "_audio.3gp";
+                        this.reminder.setAudioPath(fileDirectory.getAbsolutePath() + "/" + System.currentTimeMillis() + "_audio.3gp");
                     }
 
                     initViews();
@@ -221,17 +220,17 @@ public class AddActivity extends AppCompatActivity {
             if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                 audioPermission.launch(Manifest.permission.RECORD_AUDIO);
             } else {
+                startRecording = !startRecording;
                 onRecord(startRecording);
                 if (startRecording) {
                     recorderBtn.setText(getString(R.string.stop_recording));
                 } else {
                     recorderBtn.setText(getString(R.string.record_voice));
                     playerView.setVisibility(View.VISIBLE);
-                    Log.i("TAG", "initViews: " + fileName);
-                    reminder.setAudioPath(fileName);
+                    Log.i("TAG", "initViews: " + reminder.getAudioPath());
+//                    reminder.setAudioPath(fileName);
                     setupMediaPlayer();
                 }
-                startRecording = !startRecording;
             }
         });
 
@@ -378,31 +377,33 @@ public class AddActivity extends AppCompatActivity {
                         reminder.setHours(hours);
 
                         AlarmHelper alarmHelper = new AlarmHelper(this);
-
+                        long firstUpcomingTime = -1;
+                        for (long time : hours) {
+                            if (time > System.currentTimeMillis()) {
+                                firstUpcomingTime = time;
+                                break;
+                            }
+                        }
                         if (isEdit) {
                             reminderViewModel.updateReminder(reminder);
+                            alarmHelper.cancelAlarm(reminder);
+                            alarmHelper.setAlarm(reminder, firstUpcomingTime);
+                            finish();
                         } else {
+                            long finalFirstUpcomingTime = firstUpcomingTime;
                             reminderViewModel.insertReminder(reminder, id -> {
-                                long firstUpcomingTime = -1;
-                                for (long time : hours) {
-                                    if (time > System.currentTimeMillis()) {
-                                        firstUpcomingTime = time;
-                                        break;
-                                    }
-                                }
                                 reminder.setId((int) id);
-                                Log.i("TAG", "initViews: " + reminder.getId());
-                                alarmHelper.setAlarm(reminder, firstUpcomingTime);
+                                alarmHelper.setAlarm(reminder, finalFirstUpcomingTime);
                                 finish();
                             });
                         }
 
                     } else
-                        Toast.makeText(this, "زمان تکرار را نمی تواند کمتر از 1 ساعت باشد!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.clock_message), Toast.LENGTH_SHORT).show();
                 } else
-                    Toast.makeText(this, "empty description", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.empty_description), Toast.LENGTH_SHORT).show();
             } else
-                Toast.makeText(this, "empty title", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.empty_title), Toast.LENGTH_SHORT).show();
 
         });
 
@@ -411,7 +412,7 @@ public class AddActivity extends AppCompatActivity {
     private void setupMediaPlayer() {
         player = new MediaPlayer();
         try {
-            player.setDataSource(fileName);
+            player.setDataSource(reminder.getAudioPath());
             player.prepare();
             seekBar.setMax(player.getDuration());
             timer = new Timer();
@@ -485,7 +486,7 @@ public class AddActivity extends AppCompatActivity {
         recorder = new MediaRecorder();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        recorder.setOutputFile(fileName);
+        recorder.setOutputFile(reminder.getAudioPath());
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
         try {
@@ -493,7 +494,6 @@ public class AddActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.e("TAG", "prepare() failed");
         }
-
         recorder.start();
     }
 

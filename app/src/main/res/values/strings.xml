@@ -28,4 +28,7 @@
     <string name="stop_recording">توقف ضبط</string>
     <string name="default_audio">پیشفرض</string>
     <string name="sound_audio">آهنگ</string>
+    <string name="clock_message">زمان تکرار را نمی تواند کمتر از 1 ساعت باشد!</string>
+    <string name="empty_description">توضیحات دارو را وارد کنید.</string>
+    <string name="empty_title">نام دارو را وارد کنید.</string>
 </resources>
