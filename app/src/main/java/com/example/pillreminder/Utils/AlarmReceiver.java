@@ -35,17 +35,12 @@ public class AlarmReceiver extends BroadcastReceiver {
             startService.putExtra("reminder", reminder);
         }
         if (intent.getAction() != null) {
-            if (intent.getAction().equals(NotificationService.STOP)) {
-                if (reminder != null)
-                    alarmHelper.cancelSnoozeAlarm(reminder);
-
+            if (intent.getAction().equals(NotificationService.COMPLETE)) {
+                alarmHelper.cancelSnoozeAlarm();
                 context.stopService(startService);
             } else if (intent.getAction().equals(NotificationService.SNOOZE)) {
-                Log.i("TAG", "onReceive: " + intent.getAction());
                 long snoozeMillis = System.currentTimeMillis() + preferencesManager.getIntegerValue("snooze") * 60 * 1000L;
-                if (reminder != null) {
-                    alarmHelper.setSnoozeAlarm(reminder, snoozeMillis);
-                }
+                alarmHelper.setSnoozeAlarm(reminder, snoozeMillis);
                 context.stopService(startService);
             } else {
                 context.stopService(startService);

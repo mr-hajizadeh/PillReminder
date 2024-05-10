@@ -27,7 +27,7 @@ import java.util.Objects;
 public class NotificationService extends Service {
 
     private static final String CHANNEL_ID = "channel_id";
-    public static final String STOP = "com.example.pill-reminder.STOP_REMINDER";
+    public static final String COMPLETE = "com.example.pill-reminder.COMPLETE_REMINDER";
     public static final String SNOOZE = "com.example.pill-reminder.SNOOZE_REMINDER";
     private MediaPlayer mediaPlayer;
 
@@ -81,7 +81,8 @@ public class NotificationService extends Service {
                 e.printStackTrace();
             }
             Intent stopIntent = new Intent(this, AlarmReceiver.class);
-            stopIntent.setAction(STOP);
+            stopIntent.setAction(COMPLETE);
+            stopIntent.putExtra("reminder", reminder);
             PendingIntent stopPendingIntent =
                     PendingIntent.getBroadcast(this, 9999, stopIntent, PendingIntent.FLAG_IMMUTABLE);
 
@@ -105,6 +106,7 @@ public class NotificationService extends Service {
                     .setStyle(bigTextStyle)
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(false)
+                    .setOngoing(true)
                     .setSilent(true)
                     .setCategory(NotificationCompat.CATEGORY_REMINDER)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -113,6 +115,9 @@ public class NotificationService extends Service {
 
             notificationManager.notify(reminder.getId(), builder.build());
             startForeground(reminder.getId(), builder.build());
+
+            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 8, 0);
 
 
         }

@@ -2,6 +2,7 @@ package com.example.pillreminder.Activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
@@ -222,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel("channel_id", name, importance);
             channel.setDescription(description);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
@@ -263,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
     public void onItemDelete(Reminder reminder) {
         AlarmHelper alarmHelper = new AlarmHelper(this);
         alarmHelper.cancelAlarm(reminder);
-        alarmHelper.cancelSnoozeAlarm(reminder);
+        alarmHelper.cancelSnoozeAlarm();
         reminderViewModel.deleteReminder(reminder);
     }
 }

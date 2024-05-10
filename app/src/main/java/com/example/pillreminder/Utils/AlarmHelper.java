@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import com.example.pillreminder.Model.Reminder;
@@ -23,6 +24,7 @@ public class AlarmHelper {
 
     @SuppressLint("ScheduleExactAlarm")
     public void setAlarm(Reminder reminder) {
+        int INTENT_FLAG = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
 
         Log.i("TAG", "setAlarm: " + new Date(reminder.getFirstMilliSecond()));
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -31,7 +33,33 @@ public class AlarmHelper {
                 context,
                 reminder.getId(),
                 intent,
-                PendingIntent.FLAG_IMMUTABLE);
+                INTENT_FLAG);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminder.getFirstMilliSecond(), pendingIntent);
+    }
+
+    @SuppressLint("ScheduleExactAlarm")
+    public void updateAlarm(Reminder reminder) {
+        int INTENT_FLAG = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
+
+        cancelAlarm(reminder);
+
+        if (isAlarmSnoozeSet()) {
+            cancelSnoozeAlarm();
+            long snoozeMillis = System.currentTimeMillis() +
+                    new PreferencesManager(context).getIntegerValue("snooze") * 60 * 1000L;
+            setSnoozeAlarm(reminder, snoozeMillis);
+        }
+
+        Log.i("TAG", "setAlarm: " + new Date(reminder.getFirstMilliSecond()));
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra("reminder", reminder);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                reminder.getId(),
+                intent,
+                INTENT_FLAG);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminder.getFirstMilliSecond(), pendingIntent);
@@ -39,6 +67,7 @@ public class AlarmHelper {
 
     @SuppressLint("ScheduleExactAlarm")
     public void setSnoozeAlarm(Reminder reminder, long snoozeTime) {
+        int INTENT_FLAG = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
 
         Log.i("TAG", "setSnoozeAlarm: " + new Date(snoozeTime));
         Intent intent = new Intent(context, AlarmReceiver.class);
@@ -46,9 +75,9 @@ public class AlarmHelper {
         intent.putExtra("reminder", reminder);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
-                reminder.getId() + 1000,
+                7536,
                 intent,
-                PendingIntent.FLAG_IMMUTABLE);
+                INTENT_FLAG);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent);
@@ -56,27 +85,42 @@ public class AlarmHelper {
 
 
     public void cancelAlarm(Reminder reminder) {
+        int INTENT_FLAG = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
+
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
                 reminder.getId(),
                 intent,
-                PendingIntent.FLAG_IMMUTABLE);
-        if (alarmManager != null && pendingIntent != null) {
-            alarmManager.cancel(pendingIntent);
-        }
+                INTENT_FLAG);
+        alarmManager.cancel(pendingIntent);
     }
 
-    public void cancelSnoozeAlarm(Reminder reminder) {
+    public void cancelSnoozeAlarm() {
+        int INTENT_FLAG = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
+
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
-                reminder.getId() + 1000,
+                7536,
                 intent,
-                PendingIntent.FLAG_IMMUTABLE);
-        if (alarmManager != null && pendingIntent != null) {
-            alarmManager.cancel(pendingIntent);
-        }
+                INTENT_FLAG);
+        alarmManager.cancel(pendingIntent);
+
     }
+
+    public boolean isAlarmSnoozeSet() {
+        int INTENT_FLAG = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
+
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                1000,
+                intent,
+                INTENT_FLAG);
+
+        return pendingIntent != null;
+    }
+
 
 }

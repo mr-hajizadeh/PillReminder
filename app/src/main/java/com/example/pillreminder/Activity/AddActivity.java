@@ -382,8 +382,7 @@ public class AddActivity extends AppCompatActivity {
 
                         if (isEdit) {
                             reminderViewModel.updateReminder(reminder);
-                            alarmHelper.cancelAlarm(reminder);
-                            alarmHelper.setAlarm(reminder);
+                            alarmHelper.updateAlarm(reminder);
                             finish();
                         } else {
                             reminderViewModel.insertReminder(reminder, id -> {
