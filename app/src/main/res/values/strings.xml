@@ -31,4 +31,7 @@
     <string name="clock_message">زمان تکرار را نمی تواند کمتر از 1 ساعت باشد!</string>
     <string name="empty_description">توضیحات دارو را وارد کنید.</string>
     <string name="empty_title">نام دارو را وارد کنید.</string>
+    <string name="notification_title">زمان مصرف دارو شما رسیده</string>
+    <string name="snooze">تعویق</string>
+    <string name="done">انجام شد</string>
 </resources>

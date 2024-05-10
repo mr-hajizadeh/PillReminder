@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -25,13 +24,11 @@ import com.example.pillreminder.R;
 import java.io.IOException;
 import java.util.Objects;
 
-
 public class NotificationService extends Service {
 
     private static final String CHANNEL_ID = "channel_id";
     public static final String STOP = "com.example.pill-reminder.STOP_REMINDER";
     public static final String SNOOZE = "com.example.pill-reminder.SNOOZE_REMINDER";
-    private static final int NOTIFICATION_ID = 3698;
     private MediaPlayer mediaPlayer;
 
     @Nullable
@@ -40,18 +37,16 @@ public class NotificationService extends Service {
         return null;
     }
 
-    @SuppressLint({"ForegroundServiceType", "NotificationPermission"})
+    @SuppressLint("ForegroundServiceType")
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
 
-        Bundle data = intent.getExtras();
-        Log.i("TAG", "onReceive:Action " + intent.getAction());
+        Bundle data = intent != null ? intent.getExtras() : null;
         if (data != null) {
             Reminder reminder = data.getParcelable("reminder");
 
             NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             String musicPath = Objects.requireNonNull(reminder).getAudioPath();
-            Log.i("TAG", "onStartCommand: " + musicPath);
 
             try {
                 if (mediaPlayer != null) {
@@ -74,7 +69,7 @@ public class NotificationService extends Service {
                     mediaPlayer.setOnPreparedListener(MediaPlayer::start);
                     mediaPlayer.setLooping(true);
                     mediaPlayer.prepareAsync();
-                    Log.i("TAG", "onReceive: " + musicPath);
+                    Log.i("TAG", "musicPath: " + musicPath);
                 } else {
                     mediaPlayer = MediaPlayer.create(this, Uri.parse("android.resource://" + this.getPackageName() + "/" + R.raw.notif_sound));
                     mediaPlayer.setAudioAttributes(audioAttributes);
@@ -82,7 +77,7 @@ public class NotificationService extends Service {
                     mediaPlayer.setLooping(true);
                 }
             } catch (IOException e) {
-                Log.i("TAG", "onReceive: " + e.getMessage());
+                Log.i("TAG", "mediaPlayerFail: " + e.getMessage());
                 e.printStackTrace();
             }
             Intent stopIntent = new Intent(this, AlarmReceiver.class);
@@ -104,8 +99,8 @@ public class NotificationService extends Service {
             bigTextStyle.setBigContentTitle(reminder.getTitle());
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_pause)
-                    .setContentTitle("زمان مصرف دارو شما رسیده")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(getString(R.string.notification_title))
                     .setContentText(reminder.getTitle())
                     .setStyle(bigTextStyle)
                     .setContentIntent(pendingIntent)
@@ -113,11 +108,12 @@ public class NotificationService extends Service {
                     .setSilent(true)
                     .setCategory(NotificationCompat.CATEGORY_REMINDER)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .addAction(R.drawable.ic_play, "وقفه", snoozePendingIntent)
-                    .addAction(R.drawable.ic_play, "بستن", stopPendingIntent);
+                    .addAction(0, getString(R.string.snooze), snoozePendingIntent)
+                    .addAction(0, getString(R.string.done), stopPendingIntent);
 
-            notificationManager.notify(NOTIFICATION_ID, builder.build());
-            startForeground(NOTIFICATION_ID, builder.build());
+            notificationManager.notify(reminder.getId(), builder.build());
+            startForeground(reminder.getId(), builder.build());
+
 
         }
         return START_STICKY;

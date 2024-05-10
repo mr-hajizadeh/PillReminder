@@ -87,16 +87,12 @@ public class AddActivity extends AppCompatActivity {
         reminderViewModel.getReminderById(
                         Objects.requireNonNull(getIntent().getExtras()).getInt("id"))
                 .observe(this, reminder -> {
-                    File fileDirectory = getFilesDir();
                     if (reminder != null) {
                         this.reminder = reminder;
-                        if (this.reminder.getAudioPath() == null)
-                            this.reminder.setAudioPath(fileDirectory.getAbsolutePath() + "/" + System.currentTimeMillis() + "_audio.3gp");
                         isEdit = true;
-                    } else {
+                    } else
                         this.reminder = new Reminder();
-                        this.reminder.setAudioPath(fileDirectory.getAbsolutePath() + "/" + System.currentTimeMillis() + "_audio.3gp");
-                    }
+
 
                     initViews();
                 });
@@ -228,7 +224,6 @@ public class AddActivity extends AppCompatActivity {
                     recorderBtn.setText(getString(R.string.record_voice));
                     playerView.setVisibility(View.VISIBLE);
                     Log.i("TAG", "initViews: " + reminder.getAudioPath());
-//                    reminder.setAudioPath(fileName);
                     setupMediaPlayer();
                 }
             }
@@ -377,23 +372,23 @@ public class AddActivity extends AppCompatActivity {
                         reminder.setHours(hours);
 
                         AlarmHelper alarmHelper = new AlarmHelper(this);
-                        long firstUpcomingTime = -1;
-                        for (long time : hours) {
-                            if (time > System.currentTimeMillis()) {
-                                firstUpcomingTime = time;
+
+                        for (long time : reminder.getHours()) {
+                            if (time >= System.currentTimeMillis()) {
+                                reminder.setFirstMilliSecond(time);
                                 break;
                             }
                         }
+
                         if (isEdit) {
                             reminderViewModel.updateReminder(reminder);
                             alarmHelper.cancelAlarm(reminder);
-                            alarmHelper.setAlarm(reminder, firstUpcomingTime);
+                            alarmHelper.setAlarm(reminder);
                             finish();
                         } else {
-                            long finalFirstUpcomingTime = firstUpcomingTime;
                             reminderViewModel.insertReminder(reminder, id -> {
                                 reminder.setId((int) id);
-                                alarmHelper.setAlarm(reminder, finalFirstUpcomingTime);
+                                alarmHelper.setAlarm(reminder);
                                 finish();
                             });
                         }
@@ -483,6 +478,8 @@ public class AddActivity extends AppCompatActivity {
     }
 
     private void startRecording() {
+        File fileDirectory = getFilesDir();
+        this.reminder.setAudioPath(fileDirectory.getAbsolutePath() + "/" + System.currentTimeMillis() + "_audio.3gp");
         recorder = new MediaRecorder();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);

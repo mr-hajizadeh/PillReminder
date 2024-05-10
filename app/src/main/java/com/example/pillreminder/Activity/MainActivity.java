@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -27,6 +26,8 @@ import com.example.pillreminder.Database.ReminderViewModel;
 import com.example.pillreminder.Model.Day;
 import com.example.pillreminder.Model.Month;
 import com.example.pillreminder.Model.Reminder;
+import com.example.pillreminder.Utils.AlarmHelper;
+import com.example.pillreminder.Utils.PreferencesManager;
 import com.example.pillreminder.databinding.ActivityMainBinding;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -84,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
         initBottomAppBar();
         initReminderView();
 
+        PreferencesManager preferencesManager = new PreferencesManager(this);
+        if (!preferencesManager.checkExistsKey("snooze"))
+            preferencesManager.saveIntegerValue("snooze", 5);
     }
 
     private void initReminderView() {
@@ -101,7 +105,9 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
     private void initBottomAppBar() {
 
         BottomAppBar bottomAppBar = binding.bottomAppBar;
-        bottomAppBar.setNavigationOnClickListener(v -> Toast.makeText(this, "Setting", Toast.LENGTH_SHORT).show());
+        bottomAppBar.setNavigationOnClickListener(v -> {
+            startActivity(new Intent(this, SettingActivity.class));
+        });
 
         FloatingActionButton fab = binding.fab;
         fab.setOnClickListener(v -> {
@@ -213,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "reminder";
             String description = "reminderDescription";
-            int importance = NotificationManager.IMPORTANCE_HIGH; // تنظیم اهمیت به HIGH
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel("channel_id", name, importance);
             channel.setDescription(description);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -255,6 +261,9 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
 
     @Override
     public void onItemDelete(Reminder reminder) {
+        AlarmHelper alarmHelper = new AlarmHelper(this);
+        alarmHelper.cancelAlarm(reminder);
+        alarmHelper.cancelSnoozeAlarm(reminder);
         reminderViewModel.deleteReminder(reminder);
     }
 }

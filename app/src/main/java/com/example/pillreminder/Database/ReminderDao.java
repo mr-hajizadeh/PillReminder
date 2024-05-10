@@ -30,4 +30,7 @@ public interface ReminderDao {
             "WHERE startMilliSecond < :currentMilliSecond AND endMilliSecond >= :currentMilliSecond")
     LiveData<List<Reminder>> getReminderByDate(Long currentMilliSecond);
 
+    @Query("UPDATE Reminders SET smsStatus = :newValue WHERE id = :id")
+    void updateSmsStatus(int id, boolean newValue);
+
 }

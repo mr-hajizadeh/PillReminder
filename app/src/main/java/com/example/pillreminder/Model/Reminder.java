@@ -21,9 +21,11 @@ public class Reminder implements Parcelable {
     private int audioType;
     private String audioPath;
     private boolean limitedDay;
+    private boolean smsStatus;
     private int alarmCounter;
     private int days;
     private List<Long> hours;
+    private long firstMilliSecond;
     private long startMilliSecond;
     private long endMilliSecond;
 
@@ -36,8 +38,10 @@ public class Reminder implements Parcelable {
         audioType = in.readInt();
         audioPath = in.readString();
         limitedDay = in.readByte() != 0;
+        smsStatus = in.readByte() != 0;
         alarmCounter = in.readInt();
         days = in.readInt();
+        firstMilliSecond = in.readLong();
         startMilliSecond = in.readLong();
         endMilliSecond = in.readLong();
     }
@@ -121,6 +125,14 @@ public class Reminder implements Parcelable {
         this.limitedDay = limitedDay;
     }
 
+    public boolean isSmsStatus() {
+        return smsStatus;
+    }
+
+    public void setSmsStatus(boolean smsStatus) {
+        this.smsStatus = smsStatus;
+    }
+
     public int getAlarmCounter() {
         return alarmCounter;
     }
@@ -143,6 +155,14 @@ public class Reminder implements Parcelable {
 
     public void setHours(List<Long> hours) {
         this.hours = hours;
+    }
+
+    public long getFirstMilliSecond() {
+        return firstMilliSecond;
+    }
+
+    public void setFirstMilliSecond(long firstMilliSecond) {
+        this.firstMilliSecond = firstMilliSecond;
     }
 
     public long getStartMilliSecond() {
@@ -176,9 +196,33 @@ public class Reminder implements Parcelable {
         dest.writeInt(audioType);
         dest.writeString(audioPath);
         dest.writeByte((byte) (limitedDay ? 1 : 0));
+        dest.writeByte((byte) (smsStatus ? 1 : 0));
         dest.writeInt(alarmCounter);
         dest.writeInt(days);
+        dest.writeLong(firstMilliSecond);
         dest.writeLong(startMilliSecond);
         dest.writeLong(endMilliSecond);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Reminder{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", Description='" + Description + '\'' +
+                ", reminderHour='" + reminderHour + '\'' +
+                ", startReminderHour='" + startReminderHour + '\'' +
+                ", audioType=" + audioType +
+                ", audioPath='" + audioPath + '\'' +
+                ", smsStatus=" + smsStatus +
+                ", limitedDay=" + limitedDay +
+                ", alarmCounter=" + alarmCounter +
+                ", days=" + days +
+                ", hours=" + hours +
+                ", firstMilliSecond=" + firstMilliSecond +
+                ", startMilliSecond=" + startMilliSecond +
+                ", endMilliSecond=" + endMilliSecond +
+                '}';
     }
 }
