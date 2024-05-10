@@ -106,9 +106,7 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
     private void initBottomAppBar() {
 
         BottomAppBar bottomAppBar = binding.bottomAppBar;
-        bottomAppBar.setNavigationOnClickListener(v -> {
-            startActivity(new Intent(this, SettingActivity.class));
-        });
+        bottomAppBar.setNavigationOnClickListener(v -> startActivity(new Intent(this, SettingActivity.class)));
 
         FloatingActionButton fab = binding.fab;
         fab.setOnClickListener(v -> {
