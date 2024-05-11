@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
     private HashMap<Integer, List<Day>> monthWithDay;
     private PersianDate persianDate;
     private ReminderViewModel reminderViewModel;
+    private ReminderAdapter reminderAdapter;
 
     @SuppressLint("InlinedApi")
     @Override
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
         dayView.scrollToPosition(persianDate.getShDay() - 1);
 
         initBottomAppBar();
+
+        reminderAdapter = new ReminderAdapter(this);
         initReminderView();
 
         PreferencesManager preferencesManager = new PreferencesManager(this);
@@ -96,7 +99,8 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
         RecyclerView reminderView = binding.reminderView;
         reminderViewModel.getReminders(persianDate.getTime()).observe(this, reminders -> {
             if (reminders != null) {
-                ReminderAdapter reminderAdapter = new ReminderAdapter(reminders, persianDate, this);
+                reminderAdapter.setReminderList(reminders);
+                reminderAdapter.setCurrentDate(persianDate);
                 reminderView.setAdapter(reminderAdapter);
             }
         });

@@ -16,21 +16,30 @@ import com.example.pillreminder.databinding.ReminderItemBinding;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import saman.zamani.persiandate.PersianDate;
 
 public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ReminderHolder> {
 
-    private final List<Reminder> reminderList;
-    private final PersianDate currentDate;
+    private List<Reminder> reminderList;
+    private PersianDate currentDate;
     private final OnReminderItemClick onReminderItemClick;
     private Context context;
 
-    public ReminderAdapter(List<Reminder> reminderList, PersianDate currentDate, OnReminderItemClick onReminderItemClick) {
-        this.reminderList = reminderList;
-        this.currentDate = currentDate;
+    public ReminderAdapter(OnReminderItemClick onReminderItemClick) {
         this.onReminderItemClick = onReminderItemClick;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setReminderList(List<Reminder> reminderList) {
+        this.reminderList = reminderList;
+        notifyDataSetChanged();
+    }
+
+    public void setCurrentDate(PersianDate currentDate) {
+        this.currentDate = currentDate;
     }
 
     @NonNull
@@ -52,7 +61,8 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         holder.repeatTimeTxt.setText(reminder.getReminderHour() + " " + context.getString(R.string.hour));
         holder.descriptionTxt.setText(reminder.getDescription());
 
-        HourAdapter hourAdapter = new HourAdapter(calculateHours(reminder.getHours()));
+        HourAdapter hourAdapter = new HourAdapter(
+                calculateHours(reminder.getHours(), new Date(currentDate.getTime())));
         holder.hoursView.setAdapter(hourAdapter);
 
         holder.deleteBtn.setOnClickListener(v -> onReminderItemClick.onItemDelete(reminder));
@@ -85,31 +95,29 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         }
     }
 
-    private List<Long> calculateHours(List<Long> hourList) {
+    @SuppressLint("NewApi")
+    private List<Long> calculateHours(List<Long> hourList, Date date) {
         List<Long> hours = new ArrayList<>();
 
-        // تعیین ابتدا و انتهای روز جاری
-        Calendar startCurrentDay = Calendar.getInstance();
-        startCurrentDay.setTimeInMillis(currentDate.getTime());
-        startCurrentDay.set(Calendar.HOUR_OF_DAY, 0);
-        startCurrentDay.set(Calendar.MINUTE, 0);
-        startCurrentDay.set(Calendar.SECOND, 0);
+        Calendar startOfDay = Calendar.getInstance();
+        startOfDay.setTime(date);
+        startOfDay.set(Calendar.HOUR_OF_DAY, 0);
+        startOfDay.set(Calendar.MINUTE, 0);
+        startOfDay.set(Calendar.SECOND, 0);
+        long startOfDayMillis = startOfDay.getTimeInMillis();
 
-        Calendar endCurrentDay = Calendar.getInstance();
-        endCurrentDay.setTimeInMillis(currentDate.getTime());
-        endCurrentDay.set(Calendar.HOUR_OF_DAY, 23);
-        endCurrentDay.set(Calendar.MINUTE, 59);
-        endCurrentDay.set(Calendar.SECOND, 59);
+        Calendar endOfDay = Calendar.getInstance();
+        endOfDay.setTime(date);
+        endOfDay.set(Calendar.HOUR_OF_DAY, 23);
+        endOfDay.set(Calendar.MINUTE, 59);
+        endOfDay.set(Calendar.SECOND, 59);
+        long endOfDayMillis = endOfDay.getTimeInMillis();
 
-        // تحقق شرط و اضافه کردن به لیست
         for (long eachMilliSecond : hourList) {
-            if (startCurrentDay.getTimeInMillis() <= eachMilliSecond
-                    && eachMilliSecond <= endCurrentDay.getTimeInMillis()) {
+            if (eachMilliSecond >= startOfDayMillis && eachMilliSecond <= endOfDayMillis) {
                 hours.add(eachMilliSecond);
             }
         }
         return hours;
     }
-
-
 }

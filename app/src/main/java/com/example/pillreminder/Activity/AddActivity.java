@@ -289,7 +289,7 @@ public class AddActivity extends AppCompatActivity {
             }
         });
 
-        reminder.setDays(reminder.getDays() != 0 ? reminder.getDays() : 90);
+        reminder.setDays(reminder.getDays() != 0 ? reminder.getDays() : 60);
         if (reminder.isLimitedDay()) {
             limitedRd.setChecked(true);
             limitedDaySk.setProgress(reminder.getDays());
@@ -320,7 +320,7 @@ public class AddActivity extends AppCompatActivity {
         continuousRd.setOnClickListener(v -> {
             if (reminder.isLimitedDay()) {
                 reminder.setLimitedDay(false);
-                reminder.setDays(90);
+                reminder.setDays(60);
                 limitView.setVisibility(View.GONE);
             }
         });
@@ -383,15 +383,13 @@ public class AddActivity extends AppCompatActivity {
                         if (isEdit) {
                             reminderViewModel.updateReminder(reminder);
                             alarmHelper.updateAlarm(reminder);
-                            finish();
                         } else {
                             reminderViewModel.insertReminder(reminder, id -> {
                                 reminder.setId((int) id);
                                 alarmHelper.setAlarm(reminder);
-                                finish();
                             });
                         }
-
+                        finish();
                     } else
                         Toast.makeText(this, getString(R.string.clock_message), Toast.LENGTH_SHORT).show();
                 } else
