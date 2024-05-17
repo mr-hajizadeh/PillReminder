@@ -107,8 +107,8 @@
                 android:layout_marginTop="8dp"
                 android:hint="شماره همراه"
                 android:visibility="gone"
-                app:counterEnabled="true"
-                app:counterMaxLength="11"
+                app:helperText="09151234567, و..."
+                app:helperTextEnabled="true"
                 app:hintAnimationEnabled="true"
                 tools:visibility="visible">
 

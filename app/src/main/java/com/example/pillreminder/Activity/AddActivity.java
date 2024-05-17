@@ -70,6 +70,7 @@ public class AddActivity extends AppCompatActivity {
     private PersianDate startDate;
     private Reminder reminder;
     private ReminderViewModel reminderViewModel;
+    private MaterialButton recorderBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +107,6 @@ public class AddActivity extends AppCompatActivity {
 
         TextView startTimeTxt, startDateTxt, reminderTimeTxt, limitDayCounterTxt;
         TextInputEditText medicineNameEdt, descriptionEdt;
-        MaterialButton recorderBtn;
         LinearLayout playerView, recorderView, limitView;
         RadioButton continuousRd, limitedRd;
         SeekBar limitedDaySk;
@@ -282,6 +282,7 @@ public class AddActivity extends AppCompatActivity {
                     break;
                 case 1:
                     audioLauncher.launch("audio/*");
+                    recorderView.setVisibility(View.GONE);
                     break;
                 case 2:
                     recorderView.setVisibility(View.VISIBLE);
@@ -499,7 +500,13 @@ public class AddActivity extends AppCompatActivity {
 
     ActivityResultLauncher<String> audioPermission = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
-            isGranted -> onRecord(true)
+            isGranted -> {
+                if (isGranted) {
+                    startRecording = !startRecording;
+                    onRecord(startRecording);
+                    recorderBtn.setText(getString(R.string.stop_recording));
+                }
+            }
     );
 
     ActivityResultLauncher<String> audioLauncher = registerForActivityResult(

@@ -13,6 +13,7 @@ import androidx.annotation.RequiresApi;
 import com.example.pillreminder.Model.Reminder;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class AlarmReceiver extends BroadcastReceiver {
@@ -70,17 +71,20 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (preferencesManager.checkExistsKey("sendSms")
                 && preferencesManager.getBooleanValue("sendSms")
                 && preferencesManager.checkExistsKey("phone")) {
-            try {
-                SmsManager smsManager = SmsManager.getDefault();
-                smsManager.sendTextMessage(
-                        preferencesManager.getStringValue("phone"),
-                        null,
-                        "زمان مصرف دارو " + reminder.getTitle() + " رسیده است.",
-                        null,
-                        null);
-            } catch (Exception e) {
-                Log.i("TAG", "smsMangerFail:" + e.getMessage());
-                e.printStackTrace();
+            String[] phoneNumbers = preferencesManager.getStringValue("phone").split(",");
+            for (String phone: phoneNumbers) {
+                try {
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(
+                            phone,
+                            null,
+                            "زمان مصرف دارو " + reminder.getTitle() + " رسیده است.",
+                            null,
+                            null);
+                } catch (Exception e) {
+                    Log.i("TAG", "smsMangerFail:" + e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }
 

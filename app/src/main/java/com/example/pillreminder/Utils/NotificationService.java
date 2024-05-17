@@ -102,7 +102,7 @@ public class NotificationService extends Service {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(getString(R.string.notification_title))
-                    .setContentText(reminder.getTitle())
+                    .setContentText(reminder.getDescription())
                     .setStyle(bigTextStyle)
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(false)

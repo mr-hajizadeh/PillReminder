@@ -9,11 +9,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,6 +30,7 @@ import com.example.pillreminder.Database.ReminderViewModel;
 import com.example.pillreminder.Model.Day;
 import com.example.pillreminder.Model.Month;
 import com.example.pillreminder.Model.Reminder;
+import com.example.pillreminder.R;
 import com.example.pillreminder.Utils.AlarmHelper;
 import com.example.pillreminder.Utils.PreferencesManager;
 import com.example.pillreminder.databinding.ActivityMainBinding;
@@ -94,14 +98,21 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
             preferencesManager.saveIntegerValue("snooze", 5);
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private void initReminderView() {
 
         RecyclerView reminderView = binding.reminderView;
+        ImageView emptyView = binding.emptyImg;
         reminderViewModel.getReminders(persianDate.getTime()).observe(this, reminders -> {
-            if (reminders != null) {
+            if (reminders != null && !reminders.isEmpty()) {
                 reminderAdapter.setReminderList(reminders);
                 reminderAdapter.setCurrentDate(persianDate);
                 reminderView.setAdapter(reminderAdapter);
+                emptyView.setVisibility(View.GONE);
+                reminderView.setVisibility(View.VISIBLE);
+            } else {
+                emptyView.setVisibility(View.VISIBLE);
+                reminderView.setVisibility(View.GONE);
             }
         });
 
