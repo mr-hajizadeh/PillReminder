@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.pillreminder.Database.ReminderViewModel;
 import com.example.pillreminder.Model.Reminder;
+import com.example.pillreminder.Model.Time;
 import com.example.pillreminder.R;
 import com.example.pillreminder.Utils.AlarmHelper;
 import com.example.pillreminder.databinding.ActivityAddBinding;
@@ -43,10 +44,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Timer;
@@ -364,32 +363,29 @@ public class AddActivity extends AppCompatActivity {
                         reminder.setEndMilliSecond(endTimeCalendar.getTimeInMillis());
 
                         long repeatMillis = repeatHour * 60 * 60 * 1000L + repeatMinute * 60 * 1000L;
-
-                        List<Long> hours = new ArrayList<>();
-                        for (long currentMillis = startTimeCalendar.getTimeInMillis();
-                             currentMillis < endTimeCalendar.getTimeInMillis(); currentMillis += repeatMillis) {
-                            hours.add(currentMillis);
-                        }
-                        reminder.setHours(hours);
+                        reminder.setFirstMilliSecond(getFirstTime(startTimeCalendar, endTimeCalendar, repeatMillis));
 
                         AlarmHelper alarmHelper = new AlarmHelper(this);
 
-                        for (long time : reminder.getHours()) {
-                            if (time >= System.currentTimeMillis()) {
-                                reminder.setFirstMilliSecond(time);
-                                break;
-                            }
-                        }
-
                         if (isEdit) {
                             reminderViewModel.updateReminder(reminder);
+                            reminderViewModel.deleteTimes(reminder.getId());
+                            for (long currentMillis = startTimeCalendar.getTimeInMillis();
+                                 currentMillis < endTimeCalendar.getTimeInMillis(); currentMillis += repeatMillis) {
+                                reminderViewModel.insertTimes(new Time(reminder.getId(), currentMillis));
+                            }
                             alarmHelper.updateAlarm(reminder);
                         } else {
                             reminderViewModel.insertReminder(reminder, id -> {
                                 reminder.setId((int) id);
+                                for (long currentMillis = startTimeCalendar.getTimeInMillis();
+                                     currentMillis < endTimeCalendar.getTimeInMillis(); currentMillis += repeatMillis) {
+                                    reminderViewModel.insertTimes(new Time((int) id, currentMillis));
+                                }
                                 alarmHelper.setAlarm(reminder);
                             });
                         }
+
                         finish();
                     } else
                         Toast.makeText(this, getString(R.string.clock_message), Toast.LENGTH_SHORT).show();
@@ -400,6 +396,18 @@ public class AddActivity extends AppCompatActivity {
 
         });
 
+    }
+
+    private long getFirstTime(Calendar startCalendar, Calendar endCalendar, long repeatMillis) {
+        long firstTime = 0;
+        for (long currentMillis = startCalendar.getTimeInMillis();
+             currentMillis < endCalendar.getTimeInMillis(); currentMillis += repeatMillis) {
+            if (currentMillis >= System.currentTimeMillis()) {
+                firstTime = currentMillis;
+                break;
+            }
+        }
+        return firstTime;
     }
 
     private void setupMediaPlayer() {

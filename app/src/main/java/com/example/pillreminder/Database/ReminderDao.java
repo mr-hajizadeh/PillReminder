@@ -8,6 +8,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.example.pillreminder.Model.Reminder;
+import com.example.pillreminder.Model.Time;
 
 import java.util.List;
 
@@ -16,6 +17,9 @@ public interface ReminderDao {
 
     @Insert
     long insertReminder(Reminder reminder);
+
+    @Insert
+    void insertTimes(Time time);
 
     @Update
     void updateReminder(Reminder reminder);
@@ -30,7 +34,13 @@ public interface ReminderDao {
             "WHERE startMilliSecond < :currentMilliSecond AND endMilliSecond >= :currentMilliSecond")
     LiveData<List<Reminder>> getReminderByDate(Long currentMilliSecond);
 
-    @Query("UPDATE Reminders SET smsStatus = :newValue WHERE id = :id")
-    void updateSmsStatus(int id, boolean newValue);
+    @Query("SELECT * FROM times WHERE reminder_id = :reminderId AND time <= :endTime AND time >= :startTime")
+    LiveData<List<Time>> getTimesByReminderId(int reminderId, long startTime, long endTime);
+
+    @Query("DELETE FROM times WHERE reminder_id = :reminderId")
+    void deleteTimes(int reminderId);
+
+    @Query("SELECT time FROM times WHERE time >= :currentTime LIMIT 1")
+    LiveData<Long> firstUpcomingTime(long currentTime);
 
 }

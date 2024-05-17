@@ -16,7 +16,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,7 +29,6 @@ import com.example.pillreminder.Database.ReminderViewModel;
 import com.example.pillreminder.Model.Day;
 import com.example.pillreminder.Model.Month;
 import com.example.pillreminder.Model.Reminder;
-import com.example.pillreminder.R;
 import com.example.pillreminder.Utils.AlarmHelper;
 import com.example.pillreminder.Utils.PreferencesManager;
 import com.example.pillreminder.databinding.ActivityMainBinding;
@@ -90,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
 
         initBottomAppBar();
 
-        reminderAdapter = new ReminderAdapter(this);
+        reminderAdapter = new ReminderAdapter(reminderViewModel, this);
         initReminderView();
 
         PreferencesManager preferencesManager = new PreferencesManager(this);
@@ -279,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements OnMonthItemListen
         AlarmHelper alarmHelper = new AlarmHelper(this);
         alarmHelper.cancelAlarm(reminder);
         alarmHelper.cancelSnoozeAlarm();
+        reminderViewModel.deleteTimes(reminder.getId());
         reminderViewModel.deleteReminder(reminder);
     }
 }

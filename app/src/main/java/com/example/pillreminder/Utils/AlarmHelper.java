@@ -106,7 +106,6 @@ public class AlarmHelper {
                 intent,
                 INTENT_FLAG);
         alarmManager.cancel(pendingIntent);
-
     }
 
     public boolean isAlarmSnoozeSet() {
@@ -115,7 +114,7 @@ public class AlarmHelper {
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
-                1000,
+                7536,
                 intent,
                 INTENT_FLAG);
 

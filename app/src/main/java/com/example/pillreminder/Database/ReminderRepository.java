@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import androidx.lifecycle.LiveData;
 
 import com.example.pillreminder.Model.Reminder;
+import com.example.pillreminder.Model.Time;
 
 import java.util.List;
 
@@ -22,6 +23,10 @@ public class ReminderRepository {
         new InsertAsyncTask(reminderDao, databaseListener).execute(reminder);
     }
 
+    public void insertTimes(Time time) {
+        new InsertTimeAsyncTask(reminderDao).execute(time);
+    }
+
     public void updateReminder(Reminder reminder) {
         new UpdateAsyncTask(reminderDao).execute(reminder);
     }
@@ -30,8 +35,20 @@ public class ReminderRepository {
         new DeleteAsyncTask(reminderDao).execute(reminder);
     }
 
+    public void deleteTimes(int reminderId) {
+        new DeleteTimeAsyncTask(reminderDao).execute(reminderId);
+    }
+
     public LiveData<List<Reminder>> getReminders(long currentMilliSecond) {
         return reminderDao.getReminderByDate(currentMilliSecond);
+    }
+
+    public LiveData<List<Time>> getTimeByReminderId(int reminderId, long startTime, long endTime) {
+        return reminderDao.getTimesByReminderId(reminderId, startTime, endTime);
+    }
+
+    public LiveData<Long> firstUpcomingTime(long currentTime) {
+        return reminderDao.firstUpcomingTime(currentTime);
     }
 
     public LiveData<Reminder> getReminderById(int id) {
@@ -51,6 +68,21 @@ public class ReminderRepository {
         @Override
         protected Long doInBackground(Reminder... reminders) {
             databaseListener.onInsert(reminderDao.insertReminder(reminders[0]));
+            return null;
+        }
+    }
+
+    private static class InsertTimeAsyncTask extends AsyncTask<Time, Void, Void> {
+
+        private final ReminderDao reminderDao;
+
+        public InsertTimeAsyncTask(ReminderDao reminderDao) {
+            this.reminderDao = reminderDao;
+        }
+
+        @Override
+        protected Void doInBackground(Time... times) {
+            reminderDao.insertTimes(times[0]);
             return null;
         }
     }
@@ -81,6 +113,21 @@ public class ReminderRepository {
         @Override
         protected Void doInBackground(Reminder... reminders) {
             reminderDao.deleteReminder(reminders[0]);
+            return null;
+        }
+    }
+
+    private static class DeleteTimeAsyncTask extends AsyncTask<Integer, Void, Void> {
+
+        private final ReminderDao reminderDao;
+
+        public DeleteTimeAsyncTask(ReminderDao reminderDao) {
+            this.reminderDao = reminderDao;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... integers) {
+            reminderDao.deleteTimes(integers[0]);
             return null;
         }
     }

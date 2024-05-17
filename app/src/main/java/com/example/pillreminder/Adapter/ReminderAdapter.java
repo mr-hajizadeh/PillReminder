@@ -8,13 +8,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.pillreminder.Database.ReminderViewModel;
 import com.example.pillreminder.Model.Reminder;
 import com.example.pillreminder.R;
 import com.example.pillreminder.databinding.ReminderItemBinding;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -25,10 +26,12 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
 
     private List<Reminder> reminderList;
     private PersianDate currentDate;
+    private final ReminderViewModel reminderViewModel;
     private final OnReminderItemClick onReminderItemClick;
     private Context context;
 
-    public ReminderAdapter(OnReminderItemClick onReminderItemClick) {
+    public ReminderAdapter(ReminderViewModel reminderViewModel, OnReminderItemClick onReminderItemClick) {
+        this.reminderViewModel = reminderViewModel;
         this.onReminderItemClick = onReminderItemClick;
     }
 
@@ -61,9 +64,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         holder.repeatTimeTxt.setText(reminder.getReminderHour() + " " + context.getString(R.string.hour));
         holder.descriptionTxt.setText(reminder.getDescription());
 
-        HourAdapter hourAdapter = new HourAdapter(
-                calculateHours(reminder.getHours(), new Date(currentDate.getTime())));
-        holder.hoursView.setAdapter(hourAdapter);
+        showHours(reminder.getId(), new Date(currentDate.getTime()), holder.hoursView);
 
         holder.deleteBtn.setOnClickListener(v -> onReminderItemClick.onItemDelete(reminder));
         holder.itemView.setOnClickListener(v -> onReminderItemClick.onItemClick(reminder));
@@ -96,8 +97,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
     }
 
     @SuppressLint("NewApi")
-    private List<Long> calculateHours(List<Long> hourList, Date date) {
-        List<Long> hours = new ArrayList<>();
+    private void showHours(int id, Date date, RecyclerView recyclerView) {
 
         Calendar startOfDay = Calendar.getInstance();
         startOfDay.setTime(date);
@@ -113,11 +113,11 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         endOfDay.set(Calendar.SECOND, 59);
         long endOfDayMillis = endOfDay.getTimeInMillis();
 
-        for (long eachMilliSecond : hourList) {
-            if (eachMilliSecond >= startOfDayMillis && eachMilliSecond <= endOfDayMillis) {
-                hours.add(eachMilliSecond);
-            }
-        }
-        return hours;
+        reminderViewModel.getTimeByReminderId(id, startOfDayMillis, endOfDayMillis).observe((LifecycleOwner) context,
+                times -> {
+                    HourAdapter hourAdapter = new HourAdapter(times);
+                    recyclerView.setAdapter(hourAdapter);
+                }
+        );
     }
 }

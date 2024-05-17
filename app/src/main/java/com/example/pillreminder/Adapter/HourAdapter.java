@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.pillreminder.Model.Time;
 import com.example.pillreminder.databinding.HourItemBinding;
 
 import java.text.SimpleDateFormat;
@@ -16,9 +17,9 @@ import java.util.List;
 
 public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HoursHolder> {
 
-    private final List<Long> hours;
+    private final List<Time> hours;
 
-    public HourAdapter(List<Long> hours) {
+    public HourAdapter(List<Time> hours) {
         this.hours = hours;
     }
 
@@ -34,14 +35,14 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HoursHolder> {
 
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        Date date = new Date(hours.get(position));
+        Date date = new Date(hours.get(position).getTime());
         holder.hourTxt.setText(timeFormat.format(date));
 
     }
 
     @Override
     public int getItemCount() {
-        return hours.size();
+        return hours != null ? hours.size() : 0;
     }
 
     static class HoursHolder extends RecyclerView.ViewHolder {

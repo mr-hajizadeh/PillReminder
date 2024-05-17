@@ -8,8 +8,9 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 import com.example.pillreminder.Model.Reminder;
+import com.example.pillreminder.Model.Time;
 
-@Database(entities = {Reminder.class}, version = 1)
+@Database(entities = {Reminder.class, Time.class}, version = 1)
 @TypeConverters({Converters.class})
 public abstract class ReminderDatabase extends RoomDatabase {
 
