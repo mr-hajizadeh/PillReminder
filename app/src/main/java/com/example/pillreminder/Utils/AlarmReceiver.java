@@ -13,7 +13,6 @@ import androidx.annotation.RequiresApi;
 import com.example.pillreminder.Model.Reminder;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 public class AlarmReceiver extends BroadcastReceiver {

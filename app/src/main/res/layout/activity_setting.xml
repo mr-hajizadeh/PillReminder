@@ -10,6 +10,7 @@
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +24,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +39,7 @@
                     android:gravity="center"
                     android:text="تنظیمات"
                     android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@+id/backBtn"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -65,7 +66,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -81,7 +82,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:text="تنظیم تعویق"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
                 <NumberPicker
                     android:id="@+id/snoozePicker"
@@ -91,18 +92,24 @@
 
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginVertical="16dp"
+                android:background="@drawable/divider_background" />
+
             <CheckBox
                 android:id="@+id/sendSmsCh"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
-                android:layout_marginTop="16dp"
                 android:text="ارسال پیام" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutPhoneNumber"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginTop="8dp"
                 android:hint="شماره همراه"
@@ -121,6 +128,73 @@
                     android:maxLength="40"
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginVertical="16dp"
+                android:background="@drawable/divider_background" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/guidBtn"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="راهنمای برنامه"
+                android:gravity="start|center"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginVertical="16dp"
+                android:background="@drawable/divider_background" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingVertical="16dp"
+                android:text="درباره ما"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingVertical="16dp"
+                android:text="طراحی و پیاده سازی توسط دانشجو رضایی"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginTop="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingVertical="16dp"
+                android:text="infoPillReminder@email.com"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="64dp"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="نسخه 1.0.0" />
 
         </LinearLayout>
     </ScrollView>

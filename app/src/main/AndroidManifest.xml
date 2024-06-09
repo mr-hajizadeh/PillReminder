@@ -27,6 +27,9 @@
         android:theme="@style/Theme.PillReminder"
         tools:targetApi="31">
         <activity
+            android:name=".Activity.GuidActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activity.SettingActivity"
             android:exported="false" />
         <activity

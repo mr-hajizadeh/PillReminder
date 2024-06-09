@@ -75,7 +75,7 @@ public class AlarmHelper {
         intent.putExtra("reminder", reminder);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
-                7536,
+                98713,
                 intent,
                 INTENT_FLAG);
 
@@ -102,7 +102,7 @@ public class AlarmHelper {
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
-                7536,
+                98713,
                 intent,
                 INTENT_FLAG);
         alarmManager.cancel(pendingIntent);
@@ -114,7 +114,7 @@ public class AlarmHelper {
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
-                7536,
+                98713,
                 intent,
                 INTENT_FLAG);
 

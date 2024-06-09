@@ -339,14 +339,18 @@ public class AddActivity extends AppCompatActivity {
             int repeatHour = Integer.parseInt(splitRepeatTime[0]);
             int repeatMinute = Integer.parseInt(splitRepeatTime[1]);
 
+            if (repeatHour == 0 && repeatMinute == 0)
+                repeatHour = 24;
+
             String[] startTime = reminder.getStartReminderHour().split(":");
             int startHour = Integer.parseInt(startTime[0]);
             int startMinute = Integer.parseInt(startTime[1]);
 
             if (reminder.getTitle() != null && !reminder.getTitle().isEmpty()) {
                 if (reminder.getDescription() != null && !reminder.getDescription().isEmpty()) {
-                    if (repeatHour >= 1) {
-
+                    if (repeatHour == 0 && repeatMinute <= 59 && repeatMinute >= 1)
+                        Toast.makeText(this, getString(R.string.clock_message), Toast.LENGTH_SHORT).show();
+                    else {
                         Calendar startTimeCalendar = Calendar.getInstance();
                         startTimeCalendar.set(Calendar.YEAR, startDate.getGrgYear());
                         startTimeCalendar.set(Calendar.MONTH, startDate.getGrgMonth() - 1);
@@ -387,8 +391,7 @@ public class AddActivity extends AppCompatActivity {
                         }
 
                         finish();
-                    } else
-                        Toast.makeText(this, getString(R.string.clock_message), Toast.LENGTH_SHORT).show();
+                    }
                 } else
                     Toast.makeText(this, getString(R.string.empty_description), Toast.LENGTH_SHORT).show();
             } else
