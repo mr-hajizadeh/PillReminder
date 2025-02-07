@@ -44,8 +44,6 @@ public class SettingActivity extends AppCompatActivity {
     private void initViews() {
 
         binding.backBtn.setOnClickListener(v -> finish());
-        binding.guidBtn.setOnClickListener(v -> startActivity(new Intent(this, GuidActivity.class)));
-        binding.aboutUsBtn.setOnClickListener(v -> startActivity(new Intent(this, AboutUsActivity.class)));
 
         NumberPicker snoozePicker = binding.snoozePicker;
         snoozePicker.setMaxValue(15);
