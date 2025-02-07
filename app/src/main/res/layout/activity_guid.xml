@@ -79,6 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 android:justificationMode="inter_word"
                 android:text="به اپلیکیشن یادآور دارو خوش آمدید! ما بسیار خوشحالیم که شما به جمع کاربران ما پیوسته‌اید. این راهنما به شما کمک می‌کند تا با ویژگی‌ها و قابلیت‌های اصلی اپلیکیشن آشنا شوید و از تمامی امکانات آن به بهترین نحو بهره‌مند شوید." />
 

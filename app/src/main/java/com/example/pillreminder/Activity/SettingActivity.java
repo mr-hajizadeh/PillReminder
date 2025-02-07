@@ -3,6 +3,7 @@ package com.example.pillreminder.Activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -44,6 +45,7 @@ public class SettingActivity extends AppCompatActivity {
 
         binding.backBtn.setOnClickListener(v -> finish());
         binding.guidBtn.setOnClickListener(v -> startActivity(new Intent(this, GuidActivity.class)));
+        binding.aboutUsBtn.setOnClickListener(v -> startActivity(new Intent(this, AboutUsActivity.class)));
 
         NumberPicker snoozePicker = binding.snoozePicker;
         snoozePicker.setMaxValue(15);
