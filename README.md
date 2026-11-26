@@ -1,46 +1,87 @@
-# 💊 اپلیکیشن یادآور دارو (Pill Reminder App)
+# 💊 Pill Reminder – Medication Reminder App
 
-برنامه اندرویدی **یادآور دارو** یک اپلیکیشن کاربردی و استاندارد برای مدیریت و یادآوری دقیق زمان مصرف داروها است. این پروژه با زبان **Java** و معماری مدرن **MVVM** توسعه یافته و از پایگاه داده محلی **Room** استفاده می‌کند.
+**Pill Reminder** is an Android application designed to help users manage their medications and never miss a scheduled dose.
 
----
-
-## 📱 امکانات و ویژگی‌ها
-- **مدیریت یادآورها:** ثبت، ویرایش و حذف یادآورهای دارویی با جزئیات کامل.
-- **زمان‌بندی پیشرفته:** انتخاب روزهای هفته، ماه‌ها، ساعت شروع و بازه‌های تکرار مصرف دارو.
-- **سیستم آلارم و نوتیفیکیشن هوشمند:** پخش صدای هشدار (Alarm)، نمایش نوتیفیکیشن ماندگار (Foreground Service) با دکمه‌های تعاملی **«انجام شد»** و **«تعویق (Snooze)»**.
-- **ارسال پیامک اضطراری (پشتیبان):** قابلیت ارسال خودکار پیامک به شماره‌های اضطراری در زمان مصرف دارو.
-- **رابط کاربری مدرن (Material 3):** طراحی شده با اصول متریال ۳، کارت‌های زیبا و پشتیبانی کامل از حالت راست‌چین (RTL).
+The application is developed using **Java** and **MVVM architecture**, with **Room Database** for local data storage and reliable medication management.
 
 ---
 
-## 🖼️ تصاویر محیط برنامه
+## 📱 Features
+
+- **💊 Medication Management:** Add, edit, and delete medication reminders with detailed information.
+- **⏰ Advanced Scheduling:** Configure weekdays, months, start times, and medication repeat intervals.
+- **🔔 Smart Alarm & Notification System:** Play alarm sounds and display persistent notifications through a Foreground Service, with interactive **"Taken"** and **"Snooze"** actions.
+- **📩 Emergency SMS Notifications:** Automatically send SMS messages to emergency contacts when medication is taken.
+- **🎨 Modern User Interface:** Material 3 components, elegant cards, and full Right-to-Left (RTL) layout support.
+
+---
+
+## 🖼️ Screenshots
 
 <p align="center">
-  <img src="images/main.jpg" width="260" alt="صفحه اصلی" />
-  <img src="images/add.jpg" width="260" alt="صفحه افزودن دارو" />
-  <img src="images/setting.jpg" width="260" alt="صفحه تنظیمات" />
+  <img src="images/main.jpg" width="260" height="460" alt="Main Screen" />
+  <img src="images/add.jpg" width="260" height="460" alt="Add Medication Screen" />
+  <img src="images/setting.jpg" width="260" height="460" alt="Settings Screen" />
 </p>
 
 ---
 
-## 🛠️ تکنولوژی‌ها و معماری
-- **زبان:** Java
-- **معماری:** MVVM (Model - View - ViewModel)
-- **پایگاه داده:** Room Database + TypeConverters
-- **مدیریت زمان‌بندی:** AlarmManager & BroadcastReceiver
-- **مدیریت سرویس‌ها:** Foreground Service + MediaPlayer
-- **رابط کاربری:** Material 3 Components, ViewBinding, ConstraintLayout
+## 🛠️ Tech Stack & Architecture
+
+| Category | Technology |
+|---|---|
+| Programming Language | Java |
+| Architecture | MVVM (Model - View - ViewModel) |
+| Local Database | Room Database + TypeConverters |
+| Alarm Scheduling | AlarmManager + BroadcastReceiver |
+| Background Services | Foreground Service + MediaPlayer |
+| UI Components | Material 3 |
+| View Binding | ViewBinding |
+| Layout System | ConstraintLayout |
+| Observable Data | LiveData |
 
 ---
 
-## ⚡ بهینه‌سازی‌ها و پایداری (Optimizations & Robustness)
-- **سازگاری کامل با نسخه‌های جدید اندروید:** پشتیبانی از Foreground Service Type برای اندروید ۱۴ و بالاتر.
-- **مدیریت هوشمند آلارم‌های دقیق:** پیاده‌سازی امن `AlarmManager` با بررسی مجوزهای سیستمی جهت پایداری بالا.
-- **مدیریت چرخه عمر و همگام‌سازی:** به‌کارگیری اصولی `LiveData` و `Repository` برای واکنش‌گرا بودن دیتابیس و رابط کاربری.
+## ⚡ Optimizations & Reliability
+
+- **Android Version Compatibility:** Supports Foreground Service Types required for Android 14 and above.
+- **Reliable Alarm Scheduling:** Implements AlarmManager with system permission checks to improve alarm reliability.
+- **Lifecycle-Aware Data Management:** Uses LiveData and Repository patterns to keep the database and UI synchronized.
+- **Background Execution:** Uses Foreground Services and MediaPlayer for alarm playback and persistent notifications.
 
 ---
 
-## 🚀 نحوه نصب و اجرا
-1. پروژه را در محیط **Android Studio** (نسخه Iguana به بالا) کلون یا باز کنید.
-2. منتظر بمانید تا فایل‌های Gradle سینک شوند.
-3. پروژه را روی شبیه‌ساز یا دستگاه واقعی با اندروید ۸ به بالا اجرا کنید.
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Android Studio Iguana or newer.
+- Android SDK.
+- Java Development Kit (JDK) compatible with the project's Gradle configuration.
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/USERNAME/Pill-Reminder.git
+   ```
+
+2. Open the project in Android Studio.
+
+3. Wait for Gradle synchronization to complete.
+
+4. Run the application on an Android Emulator or a physical device running **Android 8.0 (API 26) or newer**.
+
+---
+
+## 🔒 Permissions
+
+Depending on the Android version and enabled features, the application may require permissions for:
+
+- Notifications.
+- Exact alarm scheduling.
+- Foreground services.
+- Sending SMS messages.
+
+Grant the required permissions through Android system settings when prompted.
