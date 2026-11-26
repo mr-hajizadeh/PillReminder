@@ -1,25 +1,22 @@
 package com.example.pillreminder.Activity;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pillreminder.Utils.PreferencesManager;
 import com.example.pillreminder.databinding.ActivitySettingBinding;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputLayout;
 
 public class SettingActivity extends AppCompatActivity {
@@ -27,8 +24,7 @@ public class SettingActivity extends AppCompatActivity {
     private ActivitySettingBinding binding;
     private PreferencesManager preferencesManager;
     private TextInputLayout inputLayout;
-    private CheckBox sendSms;
-
+    private MaterialSwitch sendSms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +34,11 @@ public class SettingActivity extends AppCompatActivity {
 
         preferencesManager = new PreferencesManager(this);
         initViews();
-
     }
 
     private void initViews() {
 
-        binding.backBtn.setOnClickListener(v -> finish());
+        binding.topAppBar.setNavigationOnClickListener(v -> finish());
 
         NumberPicker snoozePicker = binding.snoozePicker;
         snoozePicker.setMaxValue(15);
@@ -57,17 +52,16 @@ public class SettingActivity extends AppCompatActivity {
         EditText phoneNumberEdt = binding.phoneNumberEdt;
         inputLayout = binding.layoutPhoneNumber;
         sendSms = binding.sendSmsCh;
-        sendSms.setChecked(preferencesManager.checkExistsKey("sendSms")
-                && preferencesManager.getBooleanValue("sendSms"));
 
-        sendSms.setChecked(preferencesManager.checkExistsKey("sendSms") &&
-                preferencesManager.getBooleanValue("sendSms"));
-        inputLayout.setVisibility(sendSms.isChecked() ? View.VISIBLE : View.GONE);
+        boolean isSmsEnabled = preferencesManager.checkExistsKey("sendSms")
+                && preferencesManager.getBooleanValue("sendSms");
+        sendSms.setChecked(isSmsEnabled);
+        inputLayout.setVisibility(isSmsEnabled ? View.VISIBLE : View.GONE);
 
         sendSms.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (checkSelfPermission(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+            if (isChecked && checkSelfPermission(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
                 smsPermission.launch(Manifest.permission.SEND_SMS);
-            else {
+            } else {
                 preferencesManager.saveBooleanValue("sendSms", isChecked);
                 inputLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             }
@@ -78,7 +72,6 @@ public class SettingActivity extends AppCompatActivity {
         phoneNumberEdt.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -89,16 +82,17 @@ public class SettingActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
             }
         });
     }
 
     ActivityResultLauncher<String> smsPermission = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission()
-            , isGranted -> {
-                preferencesManager.saveBooleanValue("sendSms", sendSms.isChecked());
-                inputLayout.setVisibility(sendSms.isChecked() ? View.VISIBLE : View.GONE);
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                boolean granted = isGranted != null && isGranted;
+                boolean isChecked = granted && sendSms.isChecked();
+                sendSms.setChecked(isChecked);
+                preferencesManager.saveBooleanValue("sendSms", isChecked);
+                inputLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             });
-
 }

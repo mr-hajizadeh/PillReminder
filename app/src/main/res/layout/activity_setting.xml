@@ -5,7 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layoutDirection="rtl"
+    android:background="?attr/colorSurface"
     tools:context=".Activity.SettingActivity">
+
+    <!-- Top App Bar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="تنظیمات"
+        app:titleCentered="true"
+        app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
 
     <ScrollView
         android:layout_width="0dp"
@@ -14,139 +29,152 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/topAppBar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout"
+            <!-- Card 1: Snooze Settings -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Material3.CardView.Outlined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_marginBottom="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="1dp">
 
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:gravity="center"
-                    android:text="تنظیمات"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                    app:layout_constraintBottom_toBottomOf="@+id/backBtn"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/backBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:background="@drawable/button_background"
-                    android:clickable="true"
-                    android:contentDescription="@string/app_name"
-                    android:elevation="2dp"
-                    android:focusable="true"
-                    android:padding="12dp"
-                    android:tint="@color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_arrow_back"
-                    tools:ignore="UseAppTint" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/textView4"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:text="تنظیم تعویق"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
-
-                <NumberPicker
-                    android:id="@+id/snoozePicker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginVertical="16dp"
-                android:background="@drawable/divider_background" />
-
-            <CheckBox
-                android:id="@+id/sendSmsCh"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:text="ارسال پیام" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layoutPhoneNumber"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginTop="8dp"
-                android:hint="شماره همراه"
-                android:visibility="gone"
-                app:helperText="09151234567, و..."
-                app:helperTextEnabled="true"
-                app:hintAnimationEnabled="true"
-                tools:visibility="visible">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/phoneNumberEdt"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:imeOptions="actionNext"
-                    android:inputType="phone"
-                    android:maxLength="40"
-                    android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_marginHorizontal="8dp"
-                android:layout_marginVertical="16dp"
-                android:background="@drawable/divider_background" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textView8"
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="12dp"
+                            app:srcCompat="@drawable/ic_timer"
+                            app:tint="?attr/colorPrimary" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="زمان تعویق (Snooze)"
+                                android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="مدت زمان تکرار یادآور پس از تعویق (به دقیقه)"
+                                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                        </LinearLayout>
+
+                        <NumberPicker
+                            android:id="@+id/snoozePicker"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card 2: SMS Notification Settings -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Material3.CardView.Outlined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="64dp"
                 android:layout_marginBottom="16dp"
-                android:clickable="true"
-                android:focusable="true"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginStart="12dp"
+                            app:srcCompat="@drawable/ic_repeat"
+                            app:tint="?attr/colorPrimary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="ارسال پیامک اضطراری"
+                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/sendSmsCh"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/layoutPhoneNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:hint="شماره همراه (برای پیامک اضطراری)"
+                        android:visibility="gone"
+                        app:helperText="چند شماره را با کاما (,) جدا کنید"
+                        app:helperTextEnabled="true"
+                        app:startIconDrawable="@drawable/ic_timer"
+                        tools:visibility="visible">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/phoneNumberEdt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:imeOptions="actionDone"
+                            android:inputType="phone"
+                            android:maxLength="40"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- App Version Footer -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="24dp"
                 android:gravity="center"
-                android:text="نسخه 1.0.0" />
+                android:text="یادآور دارو • نسخه 1.0.0"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
         </LinearLayout>
     </ScrollView>

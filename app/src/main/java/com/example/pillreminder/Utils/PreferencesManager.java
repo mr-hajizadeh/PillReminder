@@ -38,7 +38,11 @@ public class PreferencesManager {
     }
 
     public int getIntegerValue(String key) {
-        return sharedPreferences.getInt(key, 0);
+        int value = sharedPreferences.getInt(key, 0);
+        if (key.equals("snooze") && value <= 0) {
+            return 5;
+        }
+        return value;
     }
 
     public boolean checkExistsKey(String key) {

@@ -41,6 +41,8 @@ public class Reminder implements Parcelable {
         smsStatus = in.readByte() != 0;
         alarmCounter = in.readInt();
         days = in.readInt();
+        hours = new java.util.ArrayList<>();
+        in.readList(hours, Long.class.getClassLoader());
         firstMilliSecond = in.readLong();
         startMilliSecond = in.readLong();
         endMilliSecond = in.readLong();
@@ -199,6 +201,7 @@ public class Reminder implements Parcelable {
         dest.writeByte((byte) (smsStatus ? 1 : 0));
         dest.writeInt(alarmCounter);
         dest.writeInt(days);
+        dest.writeList(hours);
         dest.writeLong(firstMilliSecond);
         dest.writeLong(startMilliSecond);
         dest.writeLong(endMilliSecond);

@@ -17,6 +17,7 @@ import java.util.Objects;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
+    private Context context;
     private AlarmHelper alarmHelper;
     private PreferencesManager preferencesManager;
 
@@ -24,6 +25,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        this.context = context;
         alarmHelper = new AlarmHelper(context);
         preferencesManager = new PreferencesManager(context);
 
@@ -63,7 +65,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         int repeatMinute = Integer.parseInt(splitRepeatTime[1]);
         long repeatMillis = repeatHour * 60 * 60 * 1000L + repeatMinute * 60 * 1000L;
 
-        reminder.setFirstMilliSecond((System.currentTimeMillis() + repeatMillis));
+        reminder.setFirstMilliSecond(reminder.getFirstMilliSecond() + repeatMillis);
         alarmHelper.setAlarm(reminder);
         Log.i("TAG", "nextTime: " + new Date(reminder.getFirstMilliSecond()));
 
@@ -73,7 +75,12 @@ public class AlarmReceiver extends BroadcastReceiver {
             String[] phoneNumbers = preferencesManager.getStringValue("phone").split(",");
             for (String phone: phoneNumbers) {
                 try {
-                    SmsManager smsManager = SmsManager.getDefault();
+                    SmsManager smsManager;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        smsManager = context.getSystemService(SmsManager.class);
+                    } else {
+                        smsManager = SmsManager.getDefault();
+                    }
                     smsManager.sendTextMessage(
                             phone,
                             null,

@@ -10,6 +10,7 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -114,7 +115,11 @@ public class NotificationService extends Service {
                     .addAction(0, getString(R.string.done), stopPendingIntent);
 
             notificationManager.notify(reminder.getId(), builder.build());
-            startForeground(reminder.getId(), builder.build());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(reminder.getId(), builder.build(), android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+            } else {
+                startForeground(reminder.getId(), builder.build());
+            }
 
             AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 8, 0);

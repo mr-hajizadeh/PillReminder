@@ -22,6 +22,14 @@ public class AlarmHelper {
         this.alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
 
+    private void scheduleExactAlarm(long triggerAtMillis, PendingIntent pendingIntent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+        } else {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+        }
+    }
+
     @SuppressLint("ScheduleExactAlarm")
     public void setAlarm(Reminder reminder) {
         int INTENT_FLAG = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
@@ -35,8 +43,7 @@ public class AlarmHelper {
                 intent,
                 INTENT_FLAG);
 
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminder.getFirstMilliSecond(), pendingIntent);
+        scheduleExactAlarm(reminder.getFirstMilliSecond(), pendingIntent);
     }
 
     @SuppressLint("ScheduleExactAlarm")
@@ -61,8 +68,7 @@ public class AlarmHelper {
                 intent,
                 INTENT_FLAG);
 
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminder.getFirstMilliSecond(), pendingIntent);
+        scheduleExactAlarm(reminder.getFirstMilliSecond(), pendingIntent);
     }
 
     @SuppressLint("ScheduleExactAlarm")
@@ -79,8 +85,7 @@ public class AlarmHelper {
                 intent,
                 INTENT_FLAG);
 
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, snoozeTime, pendingIntent);
+        scheduleExactAlarm(snoozeTime, pendingIntent);
     }
 
 
